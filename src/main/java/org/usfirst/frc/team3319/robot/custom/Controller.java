@@ -2,6 +2,7 @@ package org.usfirst.frc.team3319.robot.custom;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.buttons.Trigger;
 
 //This class provides the interface for the XBox Controller or the Logitech Controller, so that the OI class is not responsible for determining logic 
 //like calculating the appropriate rotation value or deadzoning the input
@@ -18,14 +19,21 @@ public class Controller {
     private JoystickButton X;
     private JoystickButton rightBumper;
     private JoystickButton leftBumper;
+    private Trigger topPOV;
+    private Trigger bottomPOV;
 
-    // The channel is the USB port, as determined by the Driver Station
+    /**
+     * 
+     * @param channel the port that controller is plugged into, as determined on the driver station
+     */
     public Controller(int channel) {
         stick = new Joystick(channel);
         Y = new JoystickButton(stick, 4);
         A = new JoystickButton(stick, 1);
         B = new JoystickButton(stick, 2);
         X = new JoystickButton(stick, 3);
+        topPOV = new TopPOVButton(stick);
+        bottomPOV = new BottomPOVButton(stick);
         rightBumper = new JoystickButton(stick,6);
         leftBumper = new JoystickButton(stick, 5);
     }
@@ -73,6 +81,14 @@ public class Controller {
 
     public JoystickButton getBButton() {
         return this.B;
+    }
+
+    public Trigger getTopPOVButton() {
+        return this.topPOV;
+    }
+
+    public Trigger getBottomPOVButton() {
+        return this.bottomPOV;
     }
 
 

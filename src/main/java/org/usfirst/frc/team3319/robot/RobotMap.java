@@ -106,7 +106,9 @@ public class RobotMap {
 	//gripper wrist 
 	public static VictorSPX gripperWrist;
 	public static Encoder wristEncoder;
-	public static DigitalInput wristLimitSwitch; 
+	//TODO, not sure if there will actually be two limit switches or not
+	public static DigitalInput lowerWristLimitSwitch; 
+	public static DigitalInput upperWristLimitSwitch;
 
 	//gripper wheels
 	public static VictorSPX gripperWheels;
@@ -114,6 +116,9 @@ public class RobotMap {
 	//arm
 	public static TalonSRX arm;
 	public static Encoder armEncoder;
+	//TODO not sure about these either
+	public static DigitalInput lowerArmLimitSwitch; 
+	public static DigitalInput upperArmLimitSwitch;
 
 	//Finger
 	public static DoubleSolenoid finger;
@@ -153,14 +158,19 @@ public class RobotMap {
 		//Gripper wrist
 		gripperWrist = new VictorSPX(1);
 		wristEncoder = new Encoder(8, 9);
-		wristLimitSwitch = new DigitalInput(12);
+		lowerWristLimitSwitch = new DigitalInput(12);//port 2 MXP
+		upperWristLimitSwitch = new DigitalInput(13);//port 3 MXP
 
 		//Gripper wheels
 		gripperWheels = new VictorSPX(2);
 
 		arm = new TalonSRX(3);
+		//TODO the arm's motor might need to be inverted if positive is not up,
+		//that is the assumption made by all the rest of the code
+		arm.setInverted(false);
 		armEncoder = new Encoder(10,11); //port 0 and port 1 on the MXP
-
+		lowerArmLimitSwitch = new DigitalInput(14);//port 4 MXP
+		upperArmLimitSwitch = new DigitalInput(15);//port 5 MXP
 
 		//Gripper finger(pneumatic)
 		finger = new DoubleSolenoid(4, 0, 1);

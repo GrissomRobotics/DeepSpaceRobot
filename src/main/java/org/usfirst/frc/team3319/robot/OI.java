@@ -60,8 +60,8 @@ public class OI {
 		otherController.getLeftBumper().whileHeld(new IntakeCargo());
 		otherController.getBButton().whenPressed(new ExtendFinger());
 		otherController.getXButton().whenPressed(new RetractFinger());
-
-		//TODO set up arm movement buttons
+		otherController.getTopPOVButton().whenActive(new RaiseArmToNextSetpoint());;
+		otherController.getBottomPOVButton().whenActive(new LowerArmToNextSetpoint());
 		}
 
 	public double getForward() {
