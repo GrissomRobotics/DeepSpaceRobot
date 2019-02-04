@@ -64,7 +64,6 @@ public class MoveArmToSetpoint extends Command {
   protected void end() {
     //TODO I don't know if disabling is the desired behavior here, holding in place might be preferable
     Robot.arm.disable();
-    if 
     if (Robot.arm.onTarget()) {
       //if we are at the right place, update the arm's internal variables
       Robot.arm.setCurrentSetpoint(desiredPos);

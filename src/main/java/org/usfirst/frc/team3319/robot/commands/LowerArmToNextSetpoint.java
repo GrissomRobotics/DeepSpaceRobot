@@ -12,11 +12,11 @@ import org.usfirst.frc.team3319.robot.custom.ArmSetpoint;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-public class RaiseArmToNextSetpoint extends Command {
+public class LowerArmToNextSetpoint extends Command {
 
   private Command armCommand;
 
-  public RaiseArmToNextSetpoint() {
+  public LowerArmToNextSetpoint() {
     //Does not require anything, the command it starts is responsible for filing requirements
   }
 
