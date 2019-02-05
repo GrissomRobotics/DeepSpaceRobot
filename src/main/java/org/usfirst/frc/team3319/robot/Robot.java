@@ -7,9 +7,15 @@
 
 package org.usfirst.frc.team3319.robot;
 
+import java.util.ArrayList;
+
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 import org.usfirst.frc.team3319.robot.custom.GripperSetpoint;
 import org.usfirst.frc.team3319.robot.subsystems.Arm;
 import org.usfirst.frc.team3319.robot.subsystems.DriveTrain;
@@ -55,6 +61,7 @@ public class Robot extends TimedRobot {
 	public static VisionThread visionThread;
 	public static VisionRunner<TapeRecognitionPipeline> visionRunner;
 	private Mat image = new Mat(); //this must be initialized or a null pointer exception occurs below
+	//private Mat line;
 	private CvSource outputToDashboard;
 	private UsbCamera streamSource;
 
@@ -85,7 +92,6 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData((Sendable) arm);
 		LiveWindow.add(gripperWrist);
 		LiveWindow.add(arm); 
-		SmartDashboard.putData(Scheduler.getInstance());
 
 		//Vision processing logic
 		streamSource = CameraServer.getInstance().startAutomaticCapture();
@@ -107,7 +113,15 @@ public class Robot extends TimedRobot {
 	//This function is called each time the tape recognizer finishes processing a frame
 	private void pipelineFinished() {
 		image = tapeRecognitionPipeline.resizeImageOutput();
-		Imgproc.drawContours(image, tapeRecognitionPipeline.filterContoursOutput(), 0 , new Scalar(0,0,0));//black outline
+		ArrayList<MatOfPoint> contours = tapeRecognitionPipeline.filterContoursOutput();
+		//line = new Mat(new Size(), 0);
+		if (contours.size()>0) {
+			Moments m = Imgproc.moments(contours.get(0));
+			Point centroid = new Point(m.m10 / m.m00,  m.m01 / m.m00);
+			//Imgproc.fitLine(contours.get(0), line, Imgproc.CV_DIST_L2, 0, 0.01, 0.01);
+			Imgproc.drawContours(image, contours, 0 , new Scalar(0,0,0));//black outline
+			Imgproc.drawMarker(image, centroid, new Scalar(0,0,0));
+		}
 		outputToDashboard.putFrame(image);
 	}
 
@@ -175,6 +189,11 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void testPeriodic() {
+	}
+
+	@Override 
+	public void robotPeriodic() {
+		SmartDashboard.putData(Scheduler.getInstance());
 	}
 
 	

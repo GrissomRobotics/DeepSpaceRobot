@@ -1,5 +1,6 @@
 package org.usfirst.frc.team3319.robot.custom;
 
+import org.usfirst.frc.team3319.robot.triggers.*;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.buttons.Trigger;

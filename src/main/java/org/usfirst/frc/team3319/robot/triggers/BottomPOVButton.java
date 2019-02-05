@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.usfirst.frc.team3319.robot.custom;
+package org.usfirst.frc.team3319.robot.triggers;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Trigger;
@@ -14,16 +14,15 @@ import edu.wpi.first.wpilibj.buttons.Trigger;
  * This trigger allows the POV pad on a given controller to be used like a button
  * for the top part of it
  */
-public class TopPOVButton extends Trigger {
+public class BottomPOVButton extends Trigger {
 
-  //TODO test if this class works as a button
   private Joystick stick;
 
   /**
    * 
    * @param stick the joystick that this trigger is affiliated with
    */
-  public TopPOVButton(Joystick stick) {
+  public BottomPOVButton(Joystick stick) {
     super();
     this.stick = stick;
   }
@@ -31,7 +30,7 @@ public class TopPOVButton extends Trigger {
 
   @Override
   public boolean get() {
-    //0 is the top on the POV
-    return stick.getPOV()==0;
+    //180 is the top on the POV
+    return stick.getPOV()==180;
   }
 }

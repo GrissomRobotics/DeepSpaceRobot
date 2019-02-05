@@ -24,6 +24,7 @@ public class MoveArmToSetpoint extends Command {
     requires(Robot.arm);
     desiredPos = setpoint;
     switch (setpoint) {
+      case BeginningConfiguration: this.setpoint = RobotMap.INITIAL_ARM_POSITION;
       case BottomHatch: this.setpoint = RobotMap.BOTTOM_HATCH_ARM_SETPOINT;
       case BottomPort: this.setpoint = RobotMap.BOTTOM_PORT_ARM_SETPOINT;
       case MiddleHatch: this.setpoint = RobotMap.MIDDLE_HATCH_ARM_SETPOINT;

@@ -117,7 +117,7 @@ public class GripperWrist extends PIDSubsystem {
         wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
     } else if (upperLimitSwitch.get()) {
       if (speed>0)
-        //if the requested speed is greater than zero (raising) and the lower limit switch is triggered,
+        //if the requested speed is greater than zero (raising) and the upper limit switch is triggered,
         //disallow
         wrist.set(ControlMode.PercentOutput, 0);
       else

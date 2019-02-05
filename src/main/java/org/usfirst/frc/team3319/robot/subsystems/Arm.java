@@ -30,6 +30,7 @@ public class Arm extends PIDSubsystem {
     //TODO figure out appropriate tolerance
     setPercentTolerance(0);
     setOutputRange(-RobotMap.ARM_SPEED, RobotMap.ARM_SPEED);
+    currentSetpoint = ArmSetpoint.BeginningConfiguration;
   }
 
   @Override
@@ -65,9 +66,9 @@ public class Arm extends PIDSubsystem {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Arm encoder",encoder.get());
-    SmartDashboard.putBoolean("Lower wrist limit switch", lowerLimitSwitch.get());
-    SmartDashboard.putBoolean("Upper wrist limit switch", upperLimitSwitch.get());
+    SmartDashboard.putNumber("Arm encoder", encoder.get());
+    SmartDashboard.putBoolean("Lower arm limit switch", lowerLimitSwitch.get());
+    SmartDashboard.putBoolean("Upper arm limit switch", upperLimitSwitch.get());
   }
 
   public void stop() {
@@ -88,21 +89,21 @@ public class Arm extends PIDSubsystem {
     //TODO someone other than Jack look at this for consistency and logic
     if (!lowerLimitSwitch.get() && !upperLimitSwitch.get()) {
       //if neither limit switch has been triggered, it is safe to just set the speed
-      motor.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
+      motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED);
     } else if (lowerLimitSwitch.get()) {
       if (speed < 0)
         //if the requested speed is less than zero (lowering) and the lower limit switch is triggered,
         //disallow
         motor.set(ControlMode.PercentOutput, 0);
       else
-        motor.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
+        motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED);
     } else if (upperLimitSwitch.get()) {
       if (speed>0)
-        //if the requested speed is greater than zero (raising) and the lower limit switch is triggered,
+        //if the requested speed is greater than zero (raising) and the upper limit switch is triggered,
         //disallow
         motor.set(ControlMode.PercentOutput, 0);
       else
-        motor.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
+        motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED);
     }
   }
 

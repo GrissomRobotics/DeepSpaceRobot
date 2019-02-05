@@ -64,6 +64,7 @@ public class RobotMap {
 	
 	//Arm setpoints
 	//TODO insert appropriate values: arm
+	public final static int INITIAL_ARM_POSITION = 0;
 	public final static int BOTTOM_HATCH_ARM_SETPOINT = 0;
 	public final static int BOTTOM_PORT_ARM_SETPOINT = 0;
 	public final static int MIDDLE_HATCH_ARM_SETPOINT = 0;
