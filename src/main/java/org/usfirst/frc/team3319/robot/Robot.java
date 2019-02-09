@@ -13,10 +13,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
-import org.usfirst.frc.team3319.robot.custom.GripperSetpoint;
 import org.usfirst.frc.team3319.robot.subsystems.Arm;
 import org.usfirst.frc.team3319.robot.subsystems.DriveTrain;
 import org.usfirst.frc.team3319.robot.subsystems.Finger;
@@ -33,7 +31,6 @@ import edu.wpi.first.vision.VisionThread;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
@@ -77,9 +74,9 @@ public class Robot extends TimedRobot {
 
 		//create subsystems
 		driveTrain = new DriveTrain();
-		gripperWrist = new GripperWrist(RobotMap.WRIST_P,RobotMap.WRIST_I,RobotMap.WRIST_D);
+		gripperWrist = new GripperWrist(RobotMap.WRIST_P,RobotMap.WRIST_I,RobotMap.WRIST_D,RobotMap.WRIST_F);
 		gripperWheels = new GripperWheels();
-		arm = new Arm(RobotMap.ARM_P,RobotMap.ARM_I,RobotMap.ARM_D);
+		arm = new Arm(RobotMap.ARM_P,RobotMap.ARM_I,RobotMap.ARM_D,RobotMap.ARM_F);
 		finger = new Finger();
 
 		//create OI
@@ -160,15 +157,18 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		//We are just using the camera to drive during the sandstorm, so no special action with an autonomous mode is necessary
 		Scheduler.getInstance().run();
 	}
 
 	@Override
 	public void teleopInit() {
 		driveTrain.setCentricMode(SmartDashboard.getBoolean("Use gyro",true) ? CentricMode.FIELD : CentricMode.ROBOT);
+		//reset all sensor values to prepare for driving
 		driveTrain.resetEncoders();
-		driveTrain.disableTurnPID();
 		driveTrain.resetGyro();
+		gripperWrist.resetEncoder();
+		arm.resetEncoder();
 		finger.retract();
 	}
 
@@ -183,6 +183,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testInit() {
 		gripperWrist.resetEncoder();
+		arm.resetEncoder();
 	}
 	/**
 	 * This function is called periodically during test mode.
@@ -193,7 +194,6 @@ public class Robot extends TimedRobot {
 
 	@Override 
 	public void robotPeriodic() {
-		SmartDashboard.putData(Scheduler.getInstance());
 	}
 
 	

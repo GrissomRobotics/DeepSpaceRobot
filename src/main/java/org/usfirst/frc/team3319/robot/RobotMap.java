@@ -43,7 +43,9 @@ public class RobotMap {
 	public final static double MAX_DRIVE_SPEED = 0.5;
 	public final static double WRIST_SPEED = 1.00;
 	public final static double GRIPPER_WHEELS_SPEED = 0.5;
-	public final static double ARM_SPEED = 0.5;//TODO actual value arm speed
+	public final static double ARM_SPEED_RAISE = 0.5;//TODO: actual value raising the arm speed
+	public final static double ARM_SPEED_LOWER = 0.03; //TODO: actual value lowering the arm speed
+	public static final double PID_PERIOD = 0.002; //This should be the same as the robot period, i.e. 20ms
 
 	//Drive PID variables
 	public final static double DRIVETRAIN_P = 0.04;
@@ -55,6 +57,7 @@ public class RobotMap {
 	public final static double WRIST_P = 0.0;
 	public final static double WRIST_I = 0.0;
 	public final static double WRIST_D = 0.0;
+	public final static double WRIST_F = 0.0;
 
 	//Gripper Wrist Setpoints
 	//TODO find appropriate values: wrist
@@ -77,6 +80,7 @@ public class RobotMap {
 	public final static double ARM_P = 0.0;
 	public final static double ARM_I = 0.0;
 	public final static double ARM_D = 0.0;
+	public final static double ARM_F = 0.0;
 	
 	//Robot components
 
@@ -107,7 +111,6 @@ public class RobotMap {
 	//gripper wrist 
 	public static VictorSPX gripperWrist;
 	public static Encoder wristEncoder;
-	//TODO, not sure if there will actually be two limit switches or not
 	public static DigitalInput lowerWristLimitSwitch; 
 	public static DigitalInput upperWristLimitSwitch;
 
@@ -117,7 +120,6 @@ public class RobotMap {
 	//arm
 	public static TalonSRX arm;
 	public static Encoder armEncoder;
-	//TODO not sure about these either
 	public static DigitalInput lowerArmLimitSwitch; 
 	public static DigitalInput upperArmLimitSwitch;
 
@@ -166,8 +168,6 @@ public class RobotMap {
 		gripperWheels = new VictorSPX(2);
 
 		arm = new TalonSRX(3);
-		//TODO the arm's motor might need to be inverted if positive is not up,
-		//that is the assumption made by all the rest of the code
 		arm.setInverted(false);
 		armEncoder = new Encoder(10,11); //port 0 and port 1 on the MXP
 		lowerArmLimitSwitch = new DigitalInput(14);//port 4 MXP

@@ -30,15 +30,11 @@ public class GripperWrist extends PIDSubsystem {
   private DigitalInput lowerLimitSwitch = RobotMap.lowerWristLimitSwitch;
   private DigitalInput upperLimitSwitch = RobotMap.upperWristLimitSwitch;
 
-  public GripperWrist(double p, double i, double d) {
-    /*
-    wrist.configRemoteFeedbackFilter(0, RemoteSensorSource.CANifier_Quadrature, 0);
-    wrist.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
-    */
-    super(p,i,d);
+  public GripperWrist(double p, double i, double d, double f) {
+    super(p,i,d,f,RobotMap.PID_PERIOD);
     setOutputRange(-RobotMap.WRIST_SPEED, RobotMap.WRIST_SPEED);
-    //TODO find the tolerance
-    setPercentTolerance(0.0);
+    //TODO find the tolerance for the wrist
+    setPercentTolerance(3.0);
     //upon initialization, the gripper should be fully folded back
     currentSetpoint = GripperSetpoint.FullyFolded;
   }
@@ -57,19 +53,19 @@ public class GripperWrist extends PIDSubsystem {
   }
 
   public void raise() {
-    setSpeed(RobotMap.WRIST_SPEED);
+    setSpeed(1.0);
   }
 
   public void raise(double speed) {
-    setSpeed(speed*RobotMap.WRIST_SPEED);
+    setSpeed(speed);
   }
 
   public void lower() {
-    setSpeed(-RobotMap.WRIST_SPEED);
+    setSpeed(-1.0);
   }
 
   public void lower(double speed) {
-    setSpeed(speed*-RobotMap.WRIST_SPEED);
+    setSpeed(speed);
   }
 
   public void stopWrist() {
@@ -101,10 +97,11 @@ public class GripperWrist extends PIDSubsystem {
   /**
    * This method should be used for all applications involving changing speed in the gripper,
    * as it contains the limit switch logic that prevents the subsystem from harming itself
+   * This method scales the requested speed, so it should not be called with arguments that have
+   * already been scaled.
    * @param speed the speed to set the wrist with, [-1,1]
    */
   public void setSpeed(double speed) {
-    //TODO someone other than Jack look at this for consistency and logic
     if (!lowerLimitSwitch.get() && !upperLimitSwitch.get()) {
       //if neither limit switch has been triggered, it is safe to just set the speed
       wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);

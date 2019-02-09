@@ -25,11 +25,11 @@ public class Arm extends PIDSubsystem {
   private DigitalInput lowerLimitSwitch = RobotMap.lowerArmLimitSwitch;
   private DigitalInput upperLimitSwitch = RobotMap.upperArmLimitSwitch;
 
-  public Arm(double p, double i, double d) {
-    super(p,i,d);
-    //TODO figure out appropriate tolerance
-    setPercentTolerance(0);
-    setOutputRange(-RobotMap.ARM_SPEED, RobotMap.ARM_SPEED);
+  public Arm(double p, double i, double d, double f) {
+    super(p,i,d,f,RobotMap.PID_PERIOD);
+    //TODO figure out appropriate tolerance for the arm
+    setPercentTolerance(3.0);
+    setOutputRange(-RobotMap.ARM_SPEED_RAISE, RobotMap.ARM_SPEED_RAISE);
     currentSetpoint = ArmSetpoint.BeginningConfiguration;
   }
 
@@ -39,19 +39,19 @@ public class Arm extends PIDSubsystem {
   }
 
   public void raise() {
-    setSpeed(RobotMap.ARM_SPEED);
+    setSpeed(1.0);
   }
 
   public void raise(double speed) {
-    setSpeed(RobotMap.ARM_SPEED*speed);
+    setSpeed(speed);
   }
 
   public void lower() {
-    setSpeed(-RobotMap.ARM_SPEED);
+    setSpeed(-1.0);
   }
 
   public void lower(double speed) {
-    setSpeed(-RobotMap.ARM_SPEED*speed);
+    setSpeed(-speed);
   }
 
   @Override
@@ -83,27 +83,28 @@ public class Arm extends PIDSubsystem {
   /**
    * This method should be used for all applications involving changing speed in the gripper,
    * as it contains the limit switch logic that prevents the subsystem from harming itself
-   * @param speed the speed to set the wrist with, [-1,1]
+   * This method scales the requested speed, so it should not be called with arguments that have
+   * already been scaled.
+   * @param speed the speed to set the arm with, [-1,1]
    */
   public void setSpeed(double speed) {
-    //TODO someone other than Jack look at this for consistency and logic
     if (!lowerLimitSwitch.get() && !upperLimitSwitch.get()) {
       //if neither limit switch has been triggered, it is safe to just set the speed
-      motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED);
+      motor.set(ControlMode.PercentOutput, speed*((speed>0)?RobotMap.ARM_SPEED_RAISE:RobotMap.ARM_SPEED_LOWER));
     } else if (lowerLimitSwitch.get()) {
       if (speed < 0)
         //if the requested speed is less than zero (lowering) and the lower limit switch is triggered,
         //disallow
         motor.set(ControlMode.PercentOutput, 0);
       else
-        motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED);
+        motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_LOWER);
     } else if (upperLimitSwitch.get()) {
       if (speed>0)
         //if the requested speed is greater than zero (raising) and the upper limit switch is triggered,
         //disallow
         motor.set(ControlMode.PercentOutput, 0);
       else
-        motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED);
+        motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_RAISE);
     }
   }
 

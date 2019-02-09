@@ -79,7 +79,8 @@ public class OI {
 	}
 
 	public double getManualArmMotion() {
-		return otherController.getLeftJoystickYAxis();
+		//negate because forward is negative
+		return -otherController.getLeftJoystickYAxis();
 	}
 
 	public double getManualGripperMotion() {

@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.buttons.Trigger;
  */
 public class TopPOVButton extends Trigger {
 
-  //TODO test if this class works as a button
   private Joystick stick;
 
   /**

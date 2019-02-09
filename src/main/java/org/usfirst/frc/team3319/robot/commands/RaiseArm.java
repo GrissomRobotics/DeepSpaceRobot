@@ -11,7 +11,6 @@ import org.usfirst.frc.team3319.robot.Robot;
 import org.usfirst.frc.team3319.robot.custom.GripperSetpoint;
 
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.command.Scheduler;
 
 public class RaiseArm extends Command {
   private MoveGripperToSetpoint gripperCommand;

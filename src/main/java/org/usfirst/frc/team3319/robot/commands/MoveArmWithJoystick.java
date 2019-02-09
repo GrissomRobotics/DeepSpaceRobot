@@ -8,7 +8,6 @@
 package org.usfirst.frc.team3319.robot.commands;
 
 import org.usfirst.frc.team3319.robot.Robot;
-import org.usfirst.frc.team3319.robot.custom.GripperSetpoint;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -29,6 +28,8 @@ public class MoveArmWithJoystick extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
+    /*
+    TODO decide if this logic is necessary during manual control for now it is disabled because the gripper is not hooked up
     if (Robot.oi.getManualArmMotion() > 0) {
       if (Robot.gripperWrist.getCurrentSetpoint() == GripperSetpoint.Expel) {
             Robot.arm.setSpeed(Robot.oi.getManualArmMotion());
@@ -38,6 +39,8 @@ public class MoveArmWithJoystick extends Command {
         gripperCommand.start();
      }
     }
+    */
+    Robot.arm.setSpeed(Robot.oi.getManualArmMotion());
   }
 
   // Make this return true when this Command no longer needs to run execute()
