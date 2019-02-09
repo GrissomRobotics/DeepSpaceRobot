@@ -45,7 +45,7 @@ public class RobotMap {
 	public final static double GRIPPER_WHEELS_SPEED = 0.5;
 	public final static double ARM_SPEED_RAISE = 0.5;//TODO: actual value raising the arm speed
 	public final static double ARM_SPEED_LOWER = 0.03; //TODO: actual value lowering the arm speed
-	public static final double PID_PERIOD = 0.002; //This should be the same as the robot period, i.e. 20ms
+	public static final double PID_PERIOD = 0.02; //This should be the same as the robot period, i.e. 20ms
 
 	//Drive PID variables
 	public final static double DRIVETRAIN_P = 0.04;

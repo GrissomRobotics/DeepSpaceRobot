@@ -17,8 +17,10 @@ import edu.wpi.first.wpilibj.command.Command;
 public class MoveArmToSetpoint extends Command {
   private int setpoint;
   private ArmSetpoint desiredPos;
+  private boolean started = false;
 
   private Command gripperCommand;
+
 
   public MoveArmToSetpoint(ArmSetpoint setpoint) {
     requires(Robot.arm);
@@ -38,20 +40,17 @@ public class MoveArmToSetpoint extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-    //TODO this might not be the correct placement for this code, (maybe it should go it execute)
-    //but the arm subsystem should stop motion in the event that the arm is entering a dangerous configuration
-    if (Robot.gripperWrist.getCurrentSetpoint() != GripperSetpoint.Expel) {
-      gripperCommand = new MoveGripperToSetpoint(GripperSetpoint.Expel);
-      gripperCommand.start();
-    }
-
-    Robot.arm.setSetpoint(setpoint);
-    Robot.arm.enable();
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
+    if (!started && gripperCommand.isCompleted()) {
+      Robot.arm.setSetpoint(setpoint);
+      Robot.arm.enable();
+      started = true;
+    }
+    
   }
 
   // Make this return true when this Command no longer needs to run execute()
