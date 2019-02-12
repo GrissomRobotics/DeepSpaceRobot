@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SerialPort.Parity;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.SerialPort.StopBits;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
@@ -42,9 +43,10 @@ public class RobotMap {
 	public final static double TURN_SPEED = 1;
 	public final static double MAX_DRIVE_SPEED = 0.5;
 	public final static double WRIST_SPEED = 1.00;
+	public final static double WRIST_HOLD_SPEED = 0.2;
 	public final static double GRIPPER_WHEELS_SPEED = 0.5;
-	public final static double ARM_SPEED_RAISE = 0.5;//TODO: actual value raising the arm speed
-	public final static double ARM_SPEED_LOWER = 0.03; //TODO: actual value lowering the arm speed
+	public final static double ARM_SPEED_RAISE = 1.0;//TODO: actual value raising the arm speed
+	public final static double ARM_SPEED_LOWER = 0.6; //TODO: actual value lowering the arm speed
 	public static final double PID_PERIOD = 0.02; //This should be the same as the robot period, i.e. 20ms
 
 	//Drive PID variables
@@ -161,6 +163,7 @@ public class RobotMap {
 		//Gripper wrist
 		gripperWrist = new VictorSPX(1);
 		wristEncoder = new Encoder(8, 9);
+		LiveWindow.add(wristEncoder);
 		lowerWristLimitSwitch = new DigitalInput(12);//port 2 MXP
 		upperWristLimitSwitch = new DigitalInput(13);//port 3 MXP
 

@@ -163,7 +163,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-		driveTrain.setCentricMode(SmartDashboard.getBoolean("Use gyro",true) ? CentricMode.FIELD : CentricMode.ROBOT);
+		driveTrain.setCentricMode(SmartDashboard.getBoolean("FIELD Centric",true) ? CentricMode.FIELD : CentricMode.ROBOT);
 		//reset all sensor values to prepare for driving
 		driveTrain.resetEncoders();
 		driveTrain.resetGyro();

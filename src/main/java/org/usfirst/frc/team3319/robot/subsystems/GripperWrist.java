@@ -10,6 +10,7 @@ package org.usfirst.frc.team3319.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import org.usfirst.frc.team3319.robot.Robot;
 import org.usfirst.frc.team3319.robot.RobotMap;
 import org.usfirst.frc.team3319.robot.commands.MoveGripperWithJoystick;
 import org.usfirst.frc.team3319.robot.custom.GripperSetpoint;
@@ -102,23 +103,12 @@ public class GripperWrist extends PIDSubsystem {
    * @param speed the speed to set the wrist with, [-1,1]
    */
   public void setSpeed(double speed) {
-    if (!lowerLimitSwitch.get() && !upperLimitSwitch.get()) {
-      //if neither limit switch has been triggered, it is safe to just set the speed
-      wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
-    } else if (lowerLimitSwitch.get()) {
-      if (speed < 0)
-        //if the requested speed is less than zero (lowering) and the lower limit switch is triggered,
-        //disallow
-        wrist.set(ControlMode.PercentOutput, 0);
-      else
+      if (speed == 0) {
+        wrist.set(ControlMode.PercentOutput, RobotMap.WRIST_HOLD_SPEED);
+      }
+      else {
+        //if neither limit switch has been triggered, it is safe to just set the speed
         wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
-    } else if (upperLimitSwitch.get()) {
-      if (speed>0)
-        //if the requested speed is greater than zero (raising) and the upper limit switch is triggered,
-        //disallow
-        wrist.set(ControlMode.PercentOutput, 0);
-      else
-        wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
+      }
     }
-  }
 }

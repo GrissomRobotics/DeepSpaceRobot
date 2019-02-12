@@ -52,7 +52,7 @@ public class OI {
 	public OI() {
 		driveController = new Controller(0);
 		otherController = new Controller(1);
-		SmartDashboard.putBoolean("FEILD Centric", false);
+		SmartDashboard.putBoolean("FIELD Centric", false);
 
 		otherController.getAButton().whenPressed(new LowerGripperToNextSetpoint());
 		otherController.getYButton().whenPressed(new RaiseGripperToNextSetpoint());
