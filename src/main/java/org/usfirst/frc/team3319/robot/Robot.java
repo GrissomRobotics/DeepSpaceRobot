@@ -56,13 +56,19 @@ public class Robot extends TimedRobot {
 	public static OI oi;
 
 	//Network tables
-	NetworkTableEntry lineEntryOneX;
-	NetworkTableEntry lineEntryOneY;
-	NetworkTableEntry lineEntryTwoX;
-	NetworkTableEntry lineEntryTwoY;
-	double lineVariable = 0;
-	NetworkTable networkTable;
-	NetworkTableInstance networkTableInstance;
+	private NetworkTableEntry testEntry; //TODO remove this once I'm sure it works
+	private NetworkTableEntry lineEntryOneX;
+	private NetworkTableEntry lineEntryOneY;
+	private NetworkTableEntry lineEntryTwoX;
+	private NetworkTableEntry lineEntryTwoY;
+	
+	//this 2D array contains the points that constitute the line on the ground in a 320 by 160 resolution
+	//image: [ [pointOneXValue, pointOneYValue]
+	//         [pointTwoXValue, pointTwoYValue] ]
+	private double[][] linePoints = new double[2][2]; 
+	private double lineVariable = 0;
+	private NetworkTable networkTable;
+	private NetworkTableInstance networkTableInstance;
 	
 
 	//Vision processing
@@ -72,9 +78,10 @@ public class Robot extends TimedRobot {
 	public static VisionThread visionThread;
 	public static VisionRunner<TapeRecognitionPipeline> visionRunner;
 	private Mat image = new Mat(); //this must be initialized or a null pointer exception occurs below
+	*/
 	private CvSource outputToDashboard;
-	private UsbCamera streamSource;
-*/
+	//private UsbCamera streamSource;
+
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -105,22 +112,25 @@ public class Robot extends TimedRobot {
 
 		networkTableInstance = NetworkTableInstance.getDefault();
 		networkTable = networkTableInstance.getTable("SmartDashboard");
+		testEntry = networkTable.getEntry("Test entry");
 		lineEntryOneX = networkTable.getEntry("Point 1 x");
-		lineEntryOneX.addListener(event -> {
-			System.out.println("Entry one has changed in value");
-		}, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
 		lineEntryOneY = networkTable.getEntry("Point 1 y");
 		lineEntryTwoX = networkTable.getEntry("Point 2 x");
 		lineEntryTwoY = networkTable.getEntry("Point 2 y");
+		
+		networkTable.addEntryListener((table, key, entry, value, flags) -> {
+			lineDataUpdated();
+			}, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+		
 
 		//Vision processing logic
 		/*
 		streamSource = CameraServer.getInstance().startAutomaticCapture();
-
-		outputToDashboard = CameraServer.getInstance().putVideo("Processed footage", 160, 120);
+		*/
+		
+		outputToDashboard = CameraServer.getInstance().putVideo("Processed footage", 320, 160);
 		outputToDashboard.setFPS(25);
-
+		/*
 		tapeRecognitionPipeline = new TapeRecognitionPipeline();
 
 		visionRunner = new VisionRunner<TapeRecognitionPipeline>(streamSource, tapeRecognitionPipeline, pipeline ->
@@ -149,6 +159,24 @@ public class Robot extends TimedRobot {
 		outputToDashboard.putFrame(image);
 	}
 	*/
+	
+	/** This function is called each time that the vision coprocessor updates 
+	 *  the data related to line following.
+	 *  The essential process of this is to assign each value in the linePoints
+	 *  2D array to some the value from the network table, with the existing value
+	 *  that is already in the table as the value to return if no data exists in the table.
+	*/
+	private void lineDataUpdated() {
+		linePoints[0][0] = lineEntryOneX.getDouble(linePoints[0][0]);
+		linePoints[0][1] = lineEntryOneY.getDouble(linePoints[0][1]);
+		linePoints[1][0] = lineEntryTwoX.getDouble(linePoints[1][0]);
+		linePoints[1][1] = lineEntryTwoY.getDouble(linePoints[1][1]);
+		//TODO test that this can draw a line on the smart dashboard with hard values
+		System.out.println(testEntry.getDouble(0.0));
+		Mat lineImage = new Mat(160,320,CvType.CV_8UC1, new Scalar(255,255,255));
+		Imgproc.line(lineImage, new Point(linePoints[0][0], linePoints[0][1]), new Point(linePoints[1][0],linePoints[1][1]),new Scalar(0,0,255),3);
+		outputToDashboard.putFrame(lineImage);
+	}
 
 	/**
 	 * This function is called once each time the robot enters Disabled mode.
@@ -198,7 +226,9 @@ public class Robot extends TimedRobot {
 		gripperWrist.resetEncoder();
 		arm.resetEncoder();
 		finger.retract();
-		lineEntryOneX.setDouble(lineVariable);
+		
+		//TODO see if testEntry works then remove
+		testEntry.setDouble(lineVariable);
 		lineVariable+=1;
 	}
 
