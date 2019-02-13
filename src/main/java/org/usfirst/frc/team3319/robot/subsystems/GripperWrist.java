@@ -28,11 +28,9 @@ public class GripperWrist extends PIDSubsystem {
   private VictorSPX wrist = RobotMap.gripperWrist;
   private Encoder wristEncoder = RobotMap.wristEncoder;
   private GripperSetpoint currentSetpoint;
-  private DigitalInput lowerLimitSwitch = RobotMap.lowerWristLimitSwitch;
-  private DigitalInput upperLimitSwitch = RobotMap.upperWristLimitSwitch;
 
-  public GripperWrist(double p, double i, double d, double f) {
-    super(p,i,d,f,RobotMap.PID_PERIOD);
+  public GripperWrist(double p, double i, double d) {
+    super(p,i,d);
     setOutputRange(-RobotMap.WRIST_SPEED, RobotMap.WRIST_SPEED);
     //TODO find the tolerance for the wrist
     setPercentTolerance(3.0);
@@ -48,8 +46,6 @@ public class GripperWrist extends PIDSubsystem {
   @Override 
   public void periodic() {
     SmartDashboard.putNumber("Wrist encoder", wristEncoder.get());
-    SmartDashboard.putBoolean("Lower wrist limit switch", lowerLimitSwitch.get());
-    SmartDashboard.putBoolean("Upper wrist limit switch", upperLimitSwitch.get());
 
   }
 

@@ -26,6 +26,10 @@ import org.usfirst.frc.team3319.swerve.math.CentricMode;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.vision.VisionRunner;
 import edu.wpi.first.vision.VisionThread;
 import edu.wpi.first.wpilibj.Sendable;
@@ -49,19 +53,28 @@ public class Robot extends TimedRobot {
 	public static Finger finger;
 
 	//OI	
-
 	public static OI oi;
 
+	//Network tables
+	NetworkTableEntry lineEntryOneX;
+	NetworkTableEntry lineEntryOneY;
+	NetworkTableEntry lineEntryTwoX;
+	NetworkTableEntry lineEntryTwoY;
+	double lineVariable = 0;
+	NetworkTable networkTable;
+	NetworkTableInstance networkTableInstance;
+	
+
 	//Vision processing
+	/*
 	public static UsbCamera camera;
 	public static TapeRecognitionPipeline tapeRecognitionPipeline;
 	public static VisionThread visionThread;
 	public static VisionRunner<TapeRecognitionPipeline> visionRunner;
 	private Mat image = new Mat(); //this must be initialized or a null pointer exception occurs below
-	//private Mat line;
 	private CvSource outputToDashboard;
 	private UsbCamera streamSource;
-
+*/
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -74,7 +87,7 @@ public class Robot extends TimedRobot {
 
 		//create subsystems
 		driveTrain = new DriveTrain();
-		gripperWrist = new GripperWrist(RobotMap.WRIST_P,RobotMap.WRIST_I,RobotMap.WRIST_D,RobotMap.WRIST_F);
+		gripperWrist = new GripperWrist(RobotMap.WRIST_P,RobotMap.WRIST_I,RobotMap.WRIST_D);
 		gripperWheels = new GripperWheels();
 		arm = new Arm(RobotMap.ARM_P,RobotMap.ARM_I,RobotMap.ARM_D,RobotMap.ARM_F);
 		finger = new Finger();
@@ -88,9 +101,21 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData((Sendable) gripperWheels);
 		SmartDashboard.putData((Sendable) arm);
 		LiveWindow.add(gripperWrist);
-		LiveWindow.add(arm); 
+		LiveWindow.add(arm);
+
+		networkTableInstance = NetworkTableInstance.getDefault();
+		networkTable = networkTableInstance.getTable("SmartDashboard");
+		lineEntryOneX = networkTable.getEntry("Point 1 x");
+		lineEntryOneX.addListener(event -> {
+			System.out.println("Entry one has changed in value");
+		}, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+		lineEntryOneY = networkTable.getEntry("Point 1 y");
+		lineEntryTwoX = networkTable.getEntry("Point 2 x");
+		lineEntryTwoY = networkTable.getEntry("Point 2 y");
 
 		//Vision processing logic
+		/*
 		streamSource = CameraServer.getInstance().startAutomaticCapture();
 
 		outputToDashboard = CameraServer.getInstance().putVideo("Processed footage", 160, 120);
@@ -105,9 +130,11 @@ public class Robot extends TimedRobot {
 		);
 		visionThread = new VisionThread(visionRunner);
 		visionThread.start();
+		*/
 	}
 
 	//This function is called each time the tape recognizer finishes processing a frame
+	/*
 	private void pipelineFinished() {
 		image = tapeRecognitionPipeline.resizeImageOutput();
 		ArrayList<MatOfPoint> contours = tapeRecognitionPipeline.filterContoursOutput();
@@ -121,6 +148,7 @@ public class Robot extends TimedRobot {
 		}
 		outputToDashboard.putFrame(image);
 	}
+	*/
 
 	/**
 	 * This function is called once each time the robot enters Disabled mode.
@@ -170,6 +198,8 @@ public class Robot extends TimedRobot {
 		gripperWrist.resetEncoder();
 		arm.resetEncoder();
 		finger.retract();
+		lineEntryOneX.setDouble(lineVariable);
+		lineVariable+=1;
 	}
 
 	/**

@@ -2,6 +2,7 @@ import cv2
 import numpy
 import math
 from enum import Enum
+from networktables import NetworkTables
 
 class TapeRecognitionPipeline:
     """
@@ -78,6 +79,7 @@ class TapeRecognitionPipeline:
         self.__mask_mask = self.hsv_threshold_output
         (self.mask_output) = self.__mask(self.__mask_input, self.__mask_mask)
 
+        """
         # Step Find_Contours0:
         self.__find_contours_input = self.mask_output
         (self.find_contours_output) = self.__find_contours(self.__find_contours_input, self.__find_contours_external_only)
@@ -85,13 +87,43 @@ class TapeRecognitionPipeline:
         # Step Filter_Contours0:
         self.__filter_contours_contours = self.find_contours_output
         (self.filter_contours_output) = self.__filter_contours(self.__filter_contours_contours, self.__filter_contours_min_area, self.__filter_contours_min_perimeter, self.__filter_contours_min_width, self.__filter_contours_max_width, self.__filter_contours_min_height, self.__filter_contours_max_height, self.__filter_contours_solidity, self.__filter_contours_max_vertices, self.__filter_contours_min_vertices, self.__filter_contours_min_ratio, self.__filter_contours_max_ratio)
+        print(self.filter_contours_output)
+        """
 
-        rows,cols = self.mask_output.shape[:2]
-        [vx,vy,x,y] = cv2.fitLine(self.mask_output, cv2.DIST_L2,0,0.01,0.01)
+        thresh = 127
+        image = cv2.cvtColor(self.mask_output, cv2.COLOR_BGR2GRAY)
+        self.grayscaleToBlackAndWhite(image,thresh)
+
+        cv2.imshow("image", image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+        rows,cols = self.mask_output.shape[:2] #
+        [vx,vy,x,y] = cv2.fitLine(cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0][0], cv2.DIST_L2,0,0.01,0.01)
         lefty = int((-x*vy/vx) + y)
         righty = int(((cols-x)*vy/vx)+y)
-        cv2.line(self.resize_image_output,(cols-1,righty),(0,lefty),(0,255,0),2)
-        print(self.resize_image_output)
+        pointOne = (cols-1,righty)
+        pointTwo = (0,lefty)
+        cv2.line(self.resize_image_output,pointOne,pointTwo,(0,0,0),2)
+        
+        cv2.imshow("Image", self.resize_image_output)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+        #publish results to network tables
+        NetworkTables.initialize(server='roboRIO-3319-FRC.local')
+        print(NetworkTables.isConnected())
+        sd = NetworkTables.getTable("SmartDashboard")
+        sd.putNumber("Point 1 x",pointOne[0])
+        sd.putNumber("Point 1 y",pointOne[1])
+        sd.putNumber("Point 2 x",pointTwo[0])
+        sd.putNumber("Point 2 y",pointTwo[1])
+
+        print(sd.getNumber("Point 1 x",0))
+        print(sd.getNumber("Point 1 y",0))
+        print(sd.getNumber("Point 2 x",0))
+        print(sd.getNumber("Point 2 y",0))
+        NetworkTables.shutdown()
 
 
     @staticmethod
@@ -106,6 +138,7 @@ class TapeRecognitionPipeline:
             A numpy.ndarray of the new size.
         """
         return cv2.resize(input, ((int)(width), (int)(height)), 0, 0, interpolation)
+
 
     @staticmethod
     def __blur(src, type, radius):
@@ -128,6 +161,7 @@ class TapeRecognitionPipeline:
             return cv2.medianBlur(src, ksize)
         else:
             return cv2.bilateralFilter(src, -1, round(radius), round(radius))
+
 
     @staticmethod
     def __hsv_threshold(input, hue, sat, val):
@@ -168,7 +202,7 @@ class TapeRecognitionPipeline:
         else:
             mode = cv2.RETR_LIST
         method = cv2.CHAIN_APPROX_SIMPLE
-        im2, contours, hierarchy =cv2.findContours(input, mode=mode, method=method)
+        contours =cv2.findContours(input, mode=mode, method=method)[0]
         return contours
 
     @staticmethod
@@ -215,9 +249,23 @@ class TapeRecognitionPipeline:
                 continue
             output.append(contour)
         return output
+    
+    @staticmethod
+    def grayscaleToBlackAndWhite(image, threshold):
+        for row in image:
+            for x in range(len(row)):
+                if row[x]>threshold:
+                    row[x] = 255
+                else:
+                    row[x] = 0
 
 
 BlurType = Enum('BlurType', 'Box_Blur Gaussian_Blur Median_Filter Bilateral_Filter')
 
 pipeline = TapeRecognitionPipeline()
-pipeline.process(cv2.imread("WIN_20190211_20_39_16_Pro.jpg"))
+image = cv2.imread("C:/Users/Robotics/Documents/2019 Code/SwerveChassis/src/main/java/org/usfirst/frc/team3319/robot/vision/image.jpg")
+
+cv2.imshow("image", image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+pipeline.process(image)

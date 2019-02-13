@@ -59,7 +59,6 @@ public class RobotMap {
 	public final static double WRIST_P = 0.0;
 	public final static double WRIST_I = 0.0;
 	public final static double WRIST_D = 0.0;
-	public final static double WRIST_F = 0.0;
 
 	//Gripper Wrist Setpoints
 	//TODO find appropriate values: wrist
@@ -113,8 +112,6 @@ public class RobotMap {
 	//gripper wrist 
 	public static VictorSPX gripperWrist;
 	public static Encoder wristEncoder;
-	public static DigitalInput lowerWristLimitSwitch; 
-	public static DigitalInput upperWristLimitSwitch;
 
 	//gripper wheels
 	public static VictorSPX gripperWheels;
@@ -164,8 +161,6 @@ public class RobotMap {
 		gripperWrist = new VictorSPX(1);
 		wristEncoder = new Encoder(8, 9);
 		LiveWindow.add(wristEncoder);
-		lowerWristLimitSwitch = new DigitalInput(12);//port 2 MXP
-		upperWristLimitSwitch = new DigitalInput(13);//port 3 MXP
 
 		//Gripper wheels
 		gripperWheels = new VictorSPX(2);
