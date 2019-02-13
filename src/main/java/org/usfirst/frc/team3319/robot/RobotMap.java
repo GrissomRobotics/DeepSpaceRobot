@@ -56,7 +56,7 @@ public class RobotMap {
 
 	//Gripper Wrist PID variables
 	//TODO PID tune gripper
-	public final static double WRIST_P = 0.0;
+	public final static double WRIST_P = 0.1;
 	public final static double WRIST_I = 0.0;
 	public final static double WRIST_D = 0.0;
 
