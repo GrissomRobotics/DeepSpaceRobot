@@ -9,6 +9,7 @@ package org.usfirst.frc.team3319.robot;
 
 import java.util.ArrayList;
 
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -129,7 +130,7 @@ public class Robot extends TimedRobot {
 		*/
 		
 		outputToDashboard = CameraServer.getInstance().putVideo("Processed footage", 320, 160);
-		outputToDashboard.setFPS(25);
+		outputToDashboard.setFPS(30);
 		/*
 		tapeRecognitionPipeline = new TapeRecognitionPipeline();
 
@@ -227,9 +228,7 @@ public class Robot extends TimedRobot {
 		arm.resetEncoder();
 		finger.retract();
 		
-		//TODO see if testEntry works then remove
-		testEntry.setDouble(lineVariable);
-		lineVariable+=1;
+		
 	}
 
 	/**
@@ -238,6 +237,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+		//TODO see if testEntry works then remove
+		testEntry.setDouble(lineVariable);
+		lineVariable+=1;
 	}
 	
 	@Override
