@@ -5,7 +5,6 @@ import numpy
 import math
 from enum import Enum
 from networktables import NetworkTables
-from cscore import CameraServer
 
 class TapeRecognitionPipeline:
     
@@ -101,37 +100,40 @@ class TapeRecognitionPipeline:
         """
 
         rows,cols = self.mask_output.shape[:2] 
-        try:
-            [vx,vy,x,y] = cv2.fitLine(cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0][0], cv2.DIST_L2,0,0.01,0.01)
-    
-            lefty = int((-x*vy/vx) + y)
-            righty = int(((cols-x)*vy/vx)+y)
-            pointOne = (cols-1,righty)
-            pointTwo = (0,lefty)
+        contour = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]
+        [vx,vy,x,y] = cv2.fitLine(numpy.argwhere(contour==255), cv2.DIST_L2,0,0.01,0.01)
 
-            """
-            cv2.line(self.resize_image_output,pointOne,pointTwo,(0,0,0),2)
+        """
+        lefty = int((-x*vy/vx) + y)
+        righty = int(((cols-x)*vy/vx)+y)
+        pointOne = (cols-1,righty)
+        pointTwo = (0,lefty)
+        """
+
+
         
-            cv2.imshow("Image", self.resize_image_output)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
-            """
-            #publish results to network tables
-            NetworkTables.initialize(server='roboRIO-3319-FRC.local')
-            print(NetworkTables.isConnected())
-            sd = NetworkTables.getTable("SmartDashboard")
-            sd.putNumber("Point 1 x",pointOne[0])
-            sd.putNumber("Point 1 y",pointOne[1])
-            sd.putNumber("Point 2 x",pointTwo[0])
-            sd.putNumber("Point 2 y",pointTwo[1])
 
-            print(sd.getNumber("Point 1 x",0))
-            print(sd.getNumber("Point 1 y",0))
-            print(sd.getNumber("Point 2 x",0))
-            print(sd.getNumber("Point 2 y",0))
-            NetworkTables.shutdown()
-        except:
-            print("Not to worry about that error")
+        """
+        cv2.line(self.resize_image_output,pointOne,pointTwo,(0,0,0),2)
+    
+        cv2.imshow("Image", self.resize_image_output)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        """
+        #publish results to network tables
+        NetworkTables.initialize(server='roboRIO-3319-FRC.local')
+        print("Is NetworkTable connected: " + str(NetworkTables.isConnected()))
+        sd = NetworkTables.getTable("SmartDashboard")
+        sd.putNumber("vx",vx)
+        sd.putNumber("vy",vy)
+        sd.putNumber("x",x)
+        sd.putNumber("y",y)
+
+        print("VX = " + str(sd.getNumber("vx",0)))
+        print("VY = "+ str(sd.getNumber("vy",0)))
+        print("X = " + str(sd.getNumber("x",0)))
+        print("Y = " + str(sd.getNumber("y",0)))
+        NetworkTables.shutdown()
 
 
     @staticmethod
@@ -266,6 +268,26 @@ class TapeRecognitionPipeline:
                     row[x] = 255
                 else:
                     row[x] = 0
+    
+    @staticmethod
+    def sum2DArray(arr):
+        total =0
+        for array in arr:
+            for item in array:
+                total+=item
+
+        return total
+
+    @staticmethod
+    def binaryToPoints(twoDArray):
+        points = []
+        pointsIndex = 0
+        for row in range(len(twoDArray)):
+            for col in range(len(row)):
+                if twoDArray[row][col]==255:
+                    points[pointsIndex] = (row, col)
+                    pointsIndex+=1
+        return points
 
 
 BlurType = Enum('BlurType', 'Box_Blur Gaussian_Blur Median_Filter Bilateral_Filter')
@@ -282,15 +304,21 @@ pipeline.process(image)
 
 def main():
     pipeline = TapeRecognitionPipeline()
-    cs = CameraServer.getInstance()
-    cs.enableLogging()
+    #cs = CameraServer.getInstance()
 
     # Capture from the first USB Camera on the system
-    camera = cs.startAutomaticCapture()
-    camera.setResolution(320, 240)
+    #camera = UsbCamera(name="Camera rPi Camera 0",path="/dev/video0")
+    #server = cs.startAutomaticCapture(camera=camera,return_server=True)
+    #camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kKeepOpen)
+
+    #camera.setResolution(320, 240)
+    capture = cv2.VideoCapture(0)
+    capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+    capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
 
     # Get a CvSink. This will capture images from the camera
-    cvSink = cs.getVideo()
+    #cvSink = cs.getVideo()
+    #cvSink.setEnabled(True)
 
     # Allocating new images is very expensive, always try to preallocate
     img = numpy.zeros(shape=(240, 320, 3), dtype=numpy.uint8)
@@ -298,11 +326,7 @@ def main():
     while True:
         # Tell the CvSink to grab a frame from the camera and put it
         # in the source image.  If there is an error notify the output.
-        time, img = cvSink.grabFrame(img)
-        if time == 0:
-            # Send the output the error.
-            # skip the rest of the current iteration
-            continue
+        retval, img = capture.read(img)
 
         #
         # Insert your image processing logic here!

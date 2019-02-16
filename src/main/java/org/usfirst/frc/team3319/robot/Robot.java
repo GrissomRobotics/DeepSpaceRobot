@@ -57,17 +57,16 @@ public class Robot extends TimedRobot {
 	public static OI oi;
 
 	//Network tables
-	private NetworkTableEntry testEntry; //TODO remove this once I'm sure it works
-	private NetworkTableEntry lineEntryOneX;
-	private NetworkTableEntry lineEntryOneY;
-	private NetworkTableEntry lineEntryTwoX;
-	private NetworkTableEntry lineEntryTwoY;
+	private NetworkTableEntry lineEntryVectorX;
+	private NetworkTableEntry lineEntryVectorY;
+	private NetworkTableEntry lineEntryX;
+	private NetworkTableEntry lineEntryY;
 	
-	//this 2D array contains the points that constitute the line on the ground in a 320 by 160 resolution
-	//image: [ [pointOneXValue, pointOneYValue]
-	//         [pointTwoXValue, pointTwoYValue] ]
-	private double[][] linePoints = new double[2][2]; 
-	private double lineVariable = 0;
+	//these values are a vector that consitutes a line and a point on that line
+	private int vx;
+	private int vy;
+	private int x;
+	private int y;
 	private NetworkTable networkTable;
 	private NetworkTableInstance networkTableInstance;
 	
@@ -113,11 +112,10 @@ public class Robot extends TimedRobot {
 
 		networkTableInstance = NetworkTableInstance.getDefault();
 		networkTable = networkTableInstance.getTable("SmartDashboard");
-		testEntry = networkTable.getEntry("Test entry");
-		lineEntryOneX = networkTable.getEntry("Point 1 x");
-		lineEntryOneY = networkTable.getEntry("Point 1 y");
-		lineEntryTwoX = networkTable.getEntry("Point 2 x");
-		lineEntryTwoY = networkTable.getEntry("Point 2 y");
+		lineEntryVectorX = networkTable.getEntry("vx");
+		lineEntryVectorY = networkTable.getEntry("vy");
+		lineEntryX = networkTable.getEntry("x");
+		lineEntryY = networkTable.getEntry("y");
 		
 		networkTable.addEntryListener((table, key, entry, value, flags) -> {
 			lineDataUpdated();
@@ -129,7 +127,7 @@ public class Robot extends TimedRobot {
 		streamSource = CameraServer.getInstance().startAutomaticCapture();
 		*/
 		
-		outputToDashboard = CameraServer.getInstance().putVideo("Processed footage", 320, 160);
+		outputToDashboard = CameraServer.getInstance().putVideo("Processed footage", 320, 240);
 		outputToDashboard.setFPS(30);
 		/*
 		tapeRecognitionPipeline = new TapeRecognitionPipeline();
@@ -168,14 +166,20 @@ public class Robot extends TimedRobot {
 	 *  that is already in the table as the value to return if no data exists in the table.
 	*/
 	private void lineDataUpdated() {
-		linePoints[0][0] = lineEntryOneX.getDouble(linePoints[0][0]);
-		linePoints[0][1] = lineEntryOneY.getDouble(linePoints[0][1]);
-		linePoints[1][0] = lineEntryTwoX.getDouble(linePoints[1][0]);
-		linePoints[1][1] = lineEntryTwoY.getDouble(linePoints[1][1]);
+		vx = (int) lineEntryVectorX.getDouble(vx);
+		vy = (int) lineEntryVectorY.getDouble(vy);
+		x = (int) lineEntryX.getDouble(x);
+		y = (int) lineEntryY.getDouble(y);
+
+		int m = 1000;
 		//TODO test that this can draw a line on the smart dashboard with hard values
-		System.out.println(testEntry.getDouble(0.0));
-		Mat lineImage = new Mat(160,320,CvType.CV_8UC1, new Scalar(255,255,255));
-		Imgproc.line(lineImage, new Point(linePoints[0][0], linePoints[0][1]), new Point(linePoints[1][0],linePoints[1][1]),new Scalar(0,0,255),3);
+
+		Mat lineImage = new Mat(240,320,CvType.CV_8UC1, new Scalar(255,255,255));
+		Imgproc.line(lineImage, 
+				new Point(x-m*vx, y-m*vy), 
+				new Point(x+m*vx,y+m*vy),
+				new Scalar(0,0,255),
+				3);
 		outputToDashboard.putFrame(lineImage);
 	}
 
@@ -237,9 +241,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		//TODO see if testEntry works then remove
-		testEntry.setDouble(lineVariable);
-		lineVariable+=1;
 	}
 	
 	@Override

@@ -32,7 +32,6 @@ public class GripperWrist extends PIDSubsystem {
   public GripperWrist(double p, double i, double d) {
     super(p,i,d);
     setOutputRange(-RobotMap.WRIST_SPEED, RobotMap.WRIST_SPEED);
-    //TODO find the tolerance for the wrist
     setPercentTolerance(3.0);
     //upon initialization, the gripper should be fully folded back
     currentSetpoint = GripperSetpoint.FullyFolded;
