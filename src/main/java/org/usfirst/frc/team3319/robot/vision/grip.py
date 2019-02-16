@@ -4,7 +4,7 @@ import cv2
 import numpy
 import math
 from enum import Enum
-from networktables import NetworkTables
+from networktables import NetworkTables, NetworkTablesInstance
 
 class TapeRecognitionPipeline:
     
@@ -101,7 +101,12 @@ class TapeRecognitionPipeline:
 
         rows,cols = self.mask_output.shape[:2] 
         contour = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]
-        [vx,vy,x,y] = cv2.fitLine(numpy.argwhere(contour==255), cv2.DIST_L2,0,0.01,0.01)
+        points = numpy.argwhere(contour==255)
+        if len(points)>0:
+            [vx,vy,x,y] = cv2.fitLine(points, cv2.DIST_L2,0,0.01,0.01)
+        else:
+            [vx,vy,x,y] = [0,0,0,0]
+            print("No contour located")
 
         """
         lefty = int((-x*vy/vx) + y)
@@ -121,9 +126,9 @@ class TapeRecognitionPipeline:
         cv2.destroyAllWindows()
         """
         #publish results to network tables
-        NetworkTables.initialize(server='roboRIO-3319-FRC.local')
-        print("Is NetworkTable connected: " + str(NetworkTables.isConnected()))
-        sd = NetworkTables.getTable("SmartDashboard")
+        
+        sd = NetworkTablesInstance.getDefault().getTable("LineData")
+        print("Is table connected: "+str(NetworkTables.isConnected()))
         sd.putNumber("vx",vx)
         sd.putNumber("vy",vy)
         sd.putNumber("x",x)
@@ -315,6 +320,7 @@ def main():
     capture = cv2.VideoCapture(0)
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+    NetworkTables.initialize(server="127.0.0.1")
 
     # Get a CvSink. This will capture images from the camera
     #cvSink = cs.getVideo()

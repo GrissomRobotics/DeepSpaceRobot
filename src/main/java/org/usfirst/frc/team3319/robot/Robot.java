@@ -69,6 +69,7 @@ public class Robot extends TimedRobot {
 	private int y;
 	private NetworkTable networkTable;
 	private NetworkTableInstance networkTableInstance;
+	private Mat lineImage = new Mat(240,320,CvType.CV_8UC1, new Scalar(255,255,255));
 	
 
 	//Vision processing
@@ -111,7 +112,7 @@ public class Robot extends TimedRobot {
 		LiveWindow.add(arm);
 
 		networkTableInstance = NetworkTableInstance.getDefault();
-		networkTable = networkTableInstance.getTable("SmartDashboard");
+		networkTable = networkTableInstance.getTable("LineData");
 		lineEntryVectorX = networkTable.getEntry("vx");
 		lineEntryVectorY = networkTable.getEntry("vy");
 		lineEntryX = networkTable.getEntry("x");
@@ -174,7 +175,10 @@ public class Robot extends TimedRobot {
 		int m = 1000;
 		//TODO test that this can draw a line on the smart dashboard with hard values
 
-		Mat lineImage = new Mat(240,320,CvType.CV_8UC1, new Scalar(255,255,255));
+		System.out.println("Line Data Updated");
+		
+		lineImage = new Mat(240,320,CvType.CV_8UC1, new Scalar(255,255,255));
+
 		Imgproc.line(lineImage, 
 				new Point(x-m*vx, y-m*vy), 
 				new Point(x+m*vx,y+m*vy),
@@ -195,7 +199,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledPeriodic() {
-		Scheduler.getInstance().run();
 	}
 
 	/**
@@ -231,7 +234,6 @@ public class Robot extends TimedRobot {
 		gripperWrist.resetEncoder();
 		arm.resetEncoder();
 		finger.retract();
-		
 		
 	}
 

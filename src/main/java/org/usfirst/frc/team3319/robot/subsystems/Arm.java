@@ -88,6 +88,7 @@ public class Arm extends PIDSubsystem {
    * @param speed the speed to set the arm with, [-1,1]
    */
   public void setSpeed(double speed) {
+    /*
     if (!lowerLimitSwitch.get() && !upperLimitSwitch.get()) {
       //if neither limit switch has been triggered, it is safe to just set the speed
       motor.set(ControlMode.PercentOutput, speed*((speed>0)?RobotMap.ARM_SPEED_RAISE:RobotMap.ARM_SPEED_LOWER));
@@ -106,6 +107,8 @@ public class Arm extends PIDSubsystem {
       else
         motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_RAISE);
     }
+    */
+    motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_RAISE);
   }
 
   public void setCurrentSetpoint(ArmSetpoint pos) {
