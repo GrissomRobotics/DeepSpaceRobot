@@ -131,27 +131,27 @@ public class RobotMap {
 	
 	public static void init() {
 		//drive train 
-		frontLeftDrive = new Talon(0);
-		frontLeftSteer = new Spark(1);
+		frontLeftDrive = new Spark(0);
+		frontLeftSteer = new Talon(1);
 		frontLeftEncoder = new Encoder(0,1);
 		frontLeft = new DriveEnclosure("front left", frontLeftDrive, frontLeftSteer, 415, frontLeftEncoder,0);
 		
-		frontRightDrive = new Talon(2);
+		frontRightDrive = new Spark(2);
 		frontRightDrive.setInverted(true);
-		frontRightSteer = new Spark(3);
+		frontRightSteer = new Talon(3);
 		
 		frontRightEncoder = new Encoder(2,3);
 		frontRight = new DriveEnclosure("front right", frontRightDrive, frontRightSteer, 415, frontRightEncoder,0);
 		
 		
-		backRightDrive = new Talon(4);
-		backRightSteer = new Spark(5);
+		backRightDrive = new Spark(4);
+		backRightSteer = new Talon(5);
 		backRightDrive.setInverted(true);
 		backRightEncoder = new Encoder(4,5);
 		backRight = new DriveEnclosure("back right", backRightDrive, backRightSteer, 415, backRightEncoder,0);
 
-		backLeftDrive = new Victor(6);
-		backLeftSteer = new Spark(7);
+		backLeftDrive = new Spark(6);
+		backLeftSteer = new Talon(7);
 		backLeftEncoder = new Encoder(6,7);
 		backLeft = new DriveEnclosure("back left", backLeftDrive, backLeftSteer, 178, backLeftEncoder,0);
 
