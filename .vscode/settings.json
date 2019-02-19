@@ -14,5 +14,6 @@
     "**/.settings": true,
     "**/.factorypath": true
   },
-  "python.linting.pylintEnabled": true
+  "python.linting.pylintEnabled": true,
+  "java.dependency.packagePresentation": "flat"
 }
