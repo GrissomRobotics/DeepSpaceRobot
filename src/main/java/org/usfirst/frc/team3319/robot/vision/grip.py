@@ -5,6 +5,7 @@ import numpy
 import math
 from enum import Enum
 from networktables import NetworkTables, NetworkTablesInstance
+import time
 
 class TapeRecognitionPipeline:
     
@@ -36,108 +37,65 @@ class TapeRecognitionPipeline:
 
         self.mask_output = None
 
-        self.__find_contours_input = self.mask_output
-        self.__find_contours_external_only = False
-
-        self.find_contours_output = None
-
-        self.__filter_contours_contours = self.find_contours_output
-        self.__filter_contours_min_area = 400.0
-        self.__filter_contours_min_perimeter = 0.0
-        self.__filter_contours_min_width = 0.0
-        self.__filter_contours_max_width = 986.0
-        self.__filter_contours_min_height = 175.0
-        self.__filter_contours_max_height = 1000.0
-        self.__filter_contours_solidity = [0.0, 100.0]
-        self.__filter_contours_max_vertices = 1000000.0
-        self.__filter_contours_min_vertices = 0.0
-        self.__filter_contours_min_ratio = 0.0
-        self.__filter_contours_max_ratio = 1000.0
-
-        self.filter_contours_output = None
-
 
     def process(self, source0):
         """
         Runs the pipeline and sets all outputs to new values.
         """
+        lastTime = time.time()
         # Step Resize_Image0:
         self.__resize_image_input = source0
         (self.resize_image_output) = self.__resize_image(self.__resize_image_input, self.__resize_image_width, self.__resize_image_height, self.__resize_image_interpolation)
+        
 
         # Step Blur0:
         self.__blur_input = self.resize_image_output
         (self.blur_output) = self.__blur(self.__blur_input, self.__blur_type, self.__blur_radius)
+       
 
         # Step HSV_Threshold0:
         self.__hsv_threshold_input = self.blur_output
         (self.hsv_threshold_output) = self.__hsv_threshold(self.__hsv_threshold_input, self.__hsv_threshold_hue, self.__hsv_threshold_saturation, self.__hsv_threshold_value)
+        
 
         # Step Mask0:
         self.__mask_input = self.resize_image_output
         self.__mask_mask = self.hsv_threshold_output
         (self.mask_output) = self.__mask(self.__mask_input, self.__mask_mask)
+        
 
-        """
-        # Step Find_Contours0:
-        self.__find_contours_input = self.mask_output
-        (self.find_contours_output) = self.__find_contours(self.__find_contours_input, self.__find_contours_external_only)
-
-        # Step Filter_Contours0:
-        self.__filter_contours_contours = self.find_contours_output
-        (self.filter_contours_output) = self.__filter_contours(self.__filter_contours_contours, self.__filter_contours_min_area, self.__filter_contours_min_perimeter, self.__filter_contours_min_width, self.__filter_contours_max_width, self.__filter_contours_min_height, self.__filter_contours_max_height, self.__filter_contours_solidity, self.__filter_contours_max_vertices, self.__filter_contours_min_vertices, self.__filter_contours_min_ratio, self.__filter_contours_max_ratio)
-        print(self.filter_contours_output)
-        """
+        image = cv2.cvtColor(self.mask_output, cv2.COLOR_BGR2GRAY)
+        
 
         thresh = 127
-        image = cv2.cvtColor(self.mask_output, cv2.COLOR_BGR2GRAY)
-        self.grayscaleToBlackAndWhite(image,thresh)
+        image = cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)[1]
+        
 
-        """
-        cv2.imshow("image", image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        """
+        rows,cols = image.shape
 
-        rows,cols = self.mask_output.shape[:2] 
+        M = cv2.getRotationMatrix2D((cols/2,rows/2),90,1)
+        image = cv2.warpAffine(image,M,(cols,rows))
+
         contour = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]
-        points = numpy.argwhere(contour==255)
+        
+
+        points = numpy.argwhere(image==255)
+        
+
         if len(points)>0:
             [vx,vy,x,y] = cv2.fitLine(points, cv2.DIST_L2,0,0.01,0.01)
+            
         else:
             [vx,vy,x,y] = [0,0,0,0]
-            print("No contour located")
-
-        """
-        lefty = int((-x*vy/vx) + y)
-        righty = int(((cols-x)*vy/vx)+y)
-        pointOne = (cols-1,righty)
-        pointTwo = (0,lefty)
-        """
-
-
         
-
-        """
-        cv2.line(self.resize_image_output,pointOne,pointTwo,(0,0,0),2)
-    
-        cv2.imshow("Image", self.resize_image_output)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        """
         #publish results to network tables
-        
-        sd = NetworkTablesInstance.getDefault().getTable("LineData")
-        print("Is table connected: "+str(NetworkTables.isConnected()))
+        sd = tableInstance.getTable("LineData")
+        print("Is table connected: "+str(tableInstance.isConnected())+"\n\n\n")
         sd.putNumber("vx",vx)
         sd.putNumber("vy",vy)
         sd.putNumber("x",x)
         sd.putNumber("y",y)
-
-        print("VX = " + str(sd.getNumber("vx",0)))
-        print("VY = "+ str(sd.getNumber("vy",0)))
-        print("X = " + str(sd.getNumber("x",0)))
-        print("Y = " + str(sd.getNumber("y",0)))
+    
         NetworkTables.shutdown()
 
 
@@ -308,6 +266,8 @@ pipeline.process(image)
 """
 
 def main():
+    global tableInstance
+
     pipeline = TapeRecognitionPipeline()
     #cs = CameraServer.getInstance()
 
@@ -320,7 +280,10 @@ def main():
     capture = cv2.VideoCapture(0)
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
-    NetworkTables.initialize(server="127.0.0.1")
+    
+    tableInstance = NetworkTablesInstance()
+    tableInstance.initialize(server="roboRIO-3319-FRC.local")
+    print(tableInstance.isConnected())
 
     # Get a CvSink. This will capture images from the camera
     #cvSink = cs.getVideo()

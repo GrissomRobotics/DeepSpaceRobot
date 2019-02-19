@@ -12,7 +12,6 @@ import org.usfirst.frc.team3319.robot.Robot;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class MoveArmWithJoystick extends Command {
-  private Command gripperCommand;
 
   public MoveArmWithJoystick() {
     // Use requires() here to declare subsystem dependencies
@@ -28,18 +27,6 @@ public class MoveArmWithJoystick extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    /*
-    TODO decide if this logic is necessary during manual control for now it is disabled because the gripper is not hooked up
-    if (Robot.oi.getManualArmMotion() > 0) {
-      if (Robot.gripperWrist.getCurrentSetpoint() == GripperSetpoint.Expel) {
-            Robot.arm.setSpeed(Robot.oi.getManualArmMotion());
-      }
-      else {
-        gripperCommand = new MoveGripperToSetpoint(GripperSetpoint.Expel);
-        gripperCommand.start();
-     }
-    }
-    */
     Robot.arm.setSpeed(Robot.oi.getManualArmMotion());
   }
 
@@ -53,9 +40,6 @@ public class MoveArmWithJoystick extends Command {
   @Override
   protected void end() {
     Robot.arm.stop();
-    if (gripperCommand !=null) {
-      gripperCommand.cancel();
-    }
   }
 
   // Called when another command which requires one or more of the same

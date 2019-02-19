@@ -21,7 +21,7 @@ import org.usfirst.frc.team3319.robot.subsystems.DriveTrain;
 import org.usfirst.frc.team3319.robot.subsystems.Finger;
 import org.usfirst.frc.team3319.robot.subsystems.GripperWheels;
 import org.usfirst.frc.team3319.robot.subsystems.GripperWrist;
-import org.usfirst.frc.team3319.robot.vision.TapeRecognitionPipeline;
+import org.usfirst.frc.team3319.robot.vision.ResizingPipeline;
 import org.usfirst.frc.team3319.swerve.math.CentricMode;
 
 import edu.wpi.cscore.CvSource;
@@ -63,25 +63,25 @@ public class Robot extends TimedRobot {
 	private NetworkTableEntry lineEntryY;
 	
 	//these values are a vector that consitutes a line and a point on that line
-	private int vx;
-	private int vy;
-	private int x;
-	private int y;
+	private double vx;
+	private double vy;
+	private double x;
+	private double y;
 	private NetworkTable networkTable;
 	private NetworkTableInstance networkTableInstance;
 	private Mat lineImage = new Mat(240,320,CvType.CV_8UC1, new Scalar(255,255,255));
+
 	
 
 	//Vision processing
-	/*
+	
 	public static UsbCamera camera;
-	public static TapeRecognitionPipeline tapeRecognitionPipeline;
+	public static ResizingPipeline tapeRecognitionPipeline;
 	public static VisionThread visionThread;
-	public static VisionRunner<TapeRecognitionPipeline> visionRunner;
+	public static VisionRunner<ResizingPipeline> visionRunner;
 	private Mat image = new Mat(); //this must be initialized or a null pointer exception occurs below
-	*/
 	private CvSource outputToDashboard;
-	//private UsbCamera streamSource;
+	private UsbCamera streamSource;
 
 
 	/**
@@ -112,6 +112,7 @@ public class Robot extends TimedRobot {
 		LiveWindow.add(arm);
 
 		networkTableInstance = NetworkTableInstance.getDefault();
+		System.out.println(networkTableInstance.isConnected());
 		networkTable = networkTableInstance.getTable("LineData");
 		lineEntryVectorX = networkTable.getEntry("vx");
 		lineEntryVectorY = networkTable.getEntry("vy");
@@ -119,34 +120,34 @@ public class Robot extends TimedRobot {
 		lineEntryY = networkTable.getEntry("y");
 		
 		networkTable.addEntryListener((table, key, entry, value, flags) -> {
-			lineDataUpdated();
+			imageUpdated();
 			}, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 		
 
+		SmartDashboard.putBoolean("Enable compressor? ", true);
+
 		//Vision processing logic
-		/*
 		streamSource = CameraServer.getInstance().startAutomaticCapture();
-		*/
+		
 		
 		outputToDashboard = CameraServer.getInstance().putVideo("Processed footage", 320, 240);
 		outputToDashboard.setFPS(30);
-		/*
-		tapeRecognitionPipeline = new TapeRecognitionPipeline();
 
-		visionRunner = new VisionRunner<TapeRecognitionPipeline>(streamSource, tapeRecognitionPipeline, pipeline ->
+		tapeRecognitionPipeline = new ResizingPipeline();
+
+		visionRunner = new VisionRunner<ResizingPipeline>(streamSource, tapeRecognitionPipeline, pipeline ->
 			{
-				pipelineFinished();	
+				imageUpdated();	
 			}
 		);
 		visionThread = new VisionThread(visionRunner);
 		visionThread.start();
-		*/
+		
 	}
 
 	//This function is called each time the tape recognizer finishes processing a frame
 	/*
 	private void pipelineFinished() {
-		image = tapeRecognitionPipeline.resizeImageOutput();
 		ArrayList<MatOfPoint> contours = tapeRecognitionPipeline.filterContoursOutput();
 		//line = new Mat(new Size(), 0);
 		if (contours.size()>0) {
@@ -162,29 +163,32 @@ public class Robot extends TimedRobot {
 	
 	/** This function is called each time that the vision coprocessor updates 
 	 *  the data related to line following.
-	 *  The essential process of this is to assign each value in the linePoints
-	 *  2D array to some the value from the network table, with the existing value
-	 *  that is already in the table as the value to return if no data exists in the table.
 	*/
-	private void lineDataUpdated() {
-		vx = (int) lineEntryVectorX.getDouble(vx);
-		vy = (int) lineEntryVectorY.getDouble(vy);
-		x = (int) lineEntryX.getDouble(x);
-		y = (int) lineEntryY.getDouble(y);
+	private void imageUpdated() {
+		image = tapeRecognitionPipeline.resizeImageOutput();
 
-		int m = 1000;
-		//TODO test that this can draw a line on the smart dashboard with hard values
+		SmartDashboard.putBoolean("Displaying line: ",driveTrain.getDisplayLine());
 
-		System.out.println("Line Data Updated");
-		
-		lineImage = new Mat(240,320,CvType.CV_8UC1, new Scalar(255,255,255));
+		if (driveTrain.getDisplayLine()) {
+			vx =  lineEntryVectorX.getDouble(vx);
+			vy =  lineEntryVectorY.getDouble(vy);
+			x =  lineEntryX.getDouble(x);
+			y =  lineEntryY.getDouble(y);
 
-		Imgproc.line(lineImage, 
-				new Point(x-m*vx, y-m*vy), 
-				new Point(x+m*vx,y+m*vy),
-				new Scalar(0,0,255),
-				3);
-		outputToDashboard.putFrame(lineImage);
+
+			int m = 1000;
+			//lineImage = new Mat(240,320,CvType.CV_8UC1, new Scalar(255,255,255));
+
+			Imgproc.line(image, 
+					new Point(x-m*vx, y-m*vy), 
+					new Point(x+m*vx, y+m*vy),
+					new Scalar(0,0,255),
+					2);
+			
+		}
+
+		outputToDashboard.putFrame(image);
+
 	}
 
 	/**
@@ -199,6 +203,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledPeriodic() {
+		//This must be here for sensor data to be updated to the dashboard while disabled, do not remove it
+		Scheduler.getInstance().run();
 	}
 
 	/**
@@ -260,6 +266,7 @@ public class Robot extends TimedRobot {
 	@Override 
 	public void robotPeriodic() {
 	}
+
 
 	
 }

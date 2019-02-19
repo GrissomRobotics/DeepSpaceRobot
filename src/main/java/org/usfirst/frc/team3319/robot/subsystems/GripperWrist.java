@@ -27,11 +27,12 @@ public class GripperWrist extends PIDSubsystem {
 
   private VictorSPX wrist = RobotMap.gripperWrist;
   private Encoder wristEncoder = RobotMap.wristEncoder;
+  private DigitalInput limitSwitch = RobotMap.wristLimitSwitch;
   private GripperSetpoint currentSetpoint;
 
   public GripperWrist(double p, double i, double d) {
     super(p,i,d);
-    setOutputRange(-RobotMap.WRIST_SPEED, RobotMap.WRIST_SPEED);
+    setOutputRange(-1, 1);
     setPercentTolerance(3.0);
     //upon initialization, the gripper should be fully folded back
     currentSetpoint = GripperSetpoint.FullyFolded;
@@ -45,7 +46,11 @@ public class GripperWrist extends PIDSubsystem {
   @Override 
   public void periodic() {
     SmartDashboard.putNumber("Wrist encoder", wristEncoder.get());
+    SmartDashboard.putBoolean("Wrist limit switch", limitSwitch.get());
 
+    if (limitSwitch.get()) {
+     // resetEncoder();
+    }
   }
 
   public void raise() {
@@ -98,12 +103,26 @@ public class GripperWrist extends PIDSubsystem {
    * @param speed the speed to set the wrist with, [-1,1]
    */
   public void setSpeed(double speed) {
-      if (speed == 0) {
-        wrist.set(ControlMode.PercentOutput, RobotMap.WRIST_HOLD_SPEED);
+    if (limitSwitch.get()) {
+        if (speed == 0) {
+          wrist.set(ControlMode.PercentOutput, 0);
+        }
+        else {
+          if (speed<0) {
+            //if we are trying to lower and the switch is depressed, we are fine
+            wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
+          } else {
+            //if the limit switch is depressed and the speed is requested is greater than 0 (i.e. raising)
+            wrist.set(ControlMode.PercentOutput, 0);
+          }
+        }
       }
-      else {
-        //if neither limit switch has been triggered, it is safe to just set the speed
-        wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
+      else { //if the limit switch hasn't been depressed
+        if (speed ==0) {
+          wrist.set(ControlMode.PercentOutput, RobotMap.WRIST_HOLD_SPEED);
+        } else {
+          wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
+        }
       }
     }
 }

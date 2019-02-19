@@ -9,9 +9,11 @@ package org.usfirst.frc.team3319.robot.subsystems;
 
 import org.usfirst.frc.team3319.robot.RobotMap;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Add your docs here.
@@ -19,9 +21,19 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public class Finger extends Subsystem {
 
   private DoubleSolenoid fingerSolenoid = RobotMap.finger; 
+  private Compressor compressor = RobotMap.compressor;
 
   @Override
   public void initDefaultCommand() {
+  }
+
+  @Override
+  public void periodic() {
+    if (SmartDashboard.getBoolean("Enable compressor? ", true)) {
+      enableCompressor();  
+    } else {
+      disableCompressor();
+    }
   }
 
   public void extend() {
@@ -30,5 +42,13 @@ public class Finger extends Subsystem {
 
   public void retract() {
     fingerSolenoid.set(Value.kReverse);
+  }
+
+  public void disableCompressor() {
+    compressor.stop();
+  }
+
+  public void enableCompressor() {
+    compressor.start();
   }
 }

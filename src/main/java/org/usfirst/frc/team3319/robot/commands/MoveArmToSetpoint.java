@@ -24,6 +24,7 @@ public class MoveArmToSetpoint extends Command {
 
   public MoveArmToSetpoint(ArmSetpoint setpoint) {
     requires(Robot.arm);
+    this.setName("MoveArmToSetpoint");
     desiredPos = setpoint;
     switch (setpoint) {
       case BeginningConfiguration: this.setpoint = RobotMap.INITIAL_ARM_POSITION;
@@ -45,7 +46,7 @@ public class MoveArmToSetpoint extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    if (!started && gripperCommand.isCompleted()) {
+    if (!started && gripperCommand != null && gripperCommand.isCompleted()) {
       Robot.arm.setSetpoint(setpoint);
       Robot.arm.enable();
       started = true;

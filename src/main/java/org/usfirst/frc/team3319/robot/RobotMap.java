@@ -16,6 +16,7 @@ import org.usfirst.frc.team3319.swerve.DriveEnclosure;
 import org.usfirst.frc.team3319.swerve.SwerveDrive;
 import org.usfirst.frc.team3319.swerve.SwerveEnclosure;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
@@ -63,8 +64,8 @@ public class RobotMap {
 	//Gripper Wrist Setpoints
 	//TODO find appropriate values: wrist
 	public final static int FULLY_FOLDED_WRIST_SETPOINT = 0;
-	public final static int EXPEL_WRIST_SETPOINT = 0;
-	public final static int INTAKE_WRIST_SETPOINT = 0;
+	public final static int EXPEL_WRIST_SETPOINT = 1100;
+	public final static int INTAKE_WRIST_SETPOINT = 30;
 	
 	//Arm setpoints
 	//TODO insert appropriate values: arm
@@ -75,6 +76,7 @@ public class RobotMap {
 	public final static int MIDDLE_PORT_ARM_SETPOINT = 0;
 	public final static int HIGH_HATCH_ARM_SETPOINT = 0;
 	public final static int HIGH_PORT_ARM_SETPOINT = 0;
+	public final static int CARGO_INTAKE_ARM_SETPOINT = 0;
 
 	//Arm PID variables
 	//TODO PID tune arm
@@ -112,6 +114,7 @@ public class RobotMap {
 	//gripper wrist 
 	public static VictorSPX gripperWrist;
 	public static Encoder wristEncoder;
+	public static DigitalInput wristLimitSwitch;
 
 	//gripper wheels
 	public static VictorSPX gripperWheels;
@@ -124,6 +127,7 @@ public class RobotMap {
 
 	//Finger
 	public static DoubleSolenoid finger;
+	public static Compressor compressor;
 
 	//sensors
 	public static PigeonIMU gyro;
@@ -161,18 +165,21 @@ public class RobotMap {
 		gripperWrist = new VictorSPX(1);
 		wristEncoder = new Encoder(8, 9);
 		LiveWindow.add(wristEncoder);
+		wristLimitSwitch = new DigitalInput(13); //port 3 on the MXP
 
 		//Gripper wheels
 		gripperWheels = new VictorSPX(2);
 
 		arm = new TalonSRX(3);
 		arm.setInverted(false);
-		armEncoder = new Encoder(10,11); //port 0 and port 1 on the MXP
+		armEncoder = new Encoder(11,10); //port 0 and port 1 on the MXP
 		lowerArmLimitSwitch = new DigitalInput(14);//port 4 MXP
-		upperArmLimitSwitch = new DigitalInput(15);//port 5 MXP
 
 		//Gripper finger(pneumatic)
 		finger = new DoubleSolenoid(4, 0, 1);
+
+		compressor = new Compressor(0);
+        compressor.setClosedLoopControl(true);
 
 		//sensors
 		gyro = new PigeonIMU(0);

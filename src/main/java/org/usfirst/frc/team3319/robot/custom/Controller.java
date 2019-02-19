@@ -20,6 +20,7 @@ public class Controller {
     private JoystickButton X;
     private JoystickButton rightBumper;
     private JoystickButton leftBumper;
+    private JoystickButton leftJoystickButton;
     private Trigger topPOV;
     private Trigger bottomPOV;
 
@@ -37,6 +38,7 @@ public class Controller {
         bottomPOV = new BottomPOVButton(stick);
         rightBumper = new JoystickButton(stick,6);
         leftBumper = new JoystickButton(stick, 5);
+        leftJoystickButton = new JoystickButton(stick, 9);
     }
 
     private double valueIfWithinDeadZone(double value) {
@@ -90,6 +92,10 @@ public class Controller {
 
     public Trigger getBottomPOVButton() {
         return this.bottomPOV;
+    }
+
+    public JoystickButton getLeftJoystickButton() {
+        return this.leftJoystickButton;
     }
 
 

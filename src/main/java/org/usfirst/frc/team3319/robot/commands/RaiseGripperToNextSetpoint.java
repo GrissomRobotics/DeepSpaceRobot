@@ -17,8 +17,7 @@ public class RaiseGripperToNextSetpoint extends Command {
   private Command gripperCommand;
 
   public RaiseGripperToNextSetpoint() {
-    // Use requires() here to declare subsystem dependencies
-    // eg. requires(chassis);
+    // Does not require: it creates another command that files the requirement
   }
 
   // Called just before this Command runs the first time

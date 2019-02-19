@@ -20,6 +20,7 @@ public class MoveGripperToSetpoint extends Command {
   public MoveGripperToSetpoint(GripperSetpoint setpoint) {
     requires(Robot.gripperWrist);
     desiredPos = setpoint;
+    super.setName("MoveGripperToSetpoint");
     switch (setpoint) {
       case FullyFolded: this.setpoint = RobotMap.FULLY_FOLDED_WRIST_SETPOINT;
       case Expel: this.setpoint = RobotMap.EXPEL_WRIST_SETPOINT;

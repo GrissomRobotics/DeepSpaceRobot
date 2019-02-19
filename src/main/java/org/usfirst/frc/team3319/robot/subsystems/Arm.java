@@ -22,14 +22,13 @@ public class Arm extends PIDSubsystem {
   private TalonSRX motor = RobotMap.arm;
   private Encoder encoder = RobotMap.armEncoder;
   private ArmSetpoint currentSetpoint;
-  private DigitalInput lowerLimitSwitch = RobotMap.lowerArmLimitSwitch;
-  private DigitalInput upperLimitSwitch = RobotMap.upperArmLimitSwitch;
+  private DigitalInput limitSwitch = RobotMap.lowerArmLimitSwitch;
 
   public Arm(double p, double i, double d, double f) {
     super(p,i,d,f,RobotMap.PID_PERIOD);
     //TODO figure out appropriate tolerance for the arm
     setPercentTolerance(3.0);
-    setOutputRange(-RobotMap.ARM_SPEED_RAISE, RobotMap.ARM_SPEED_RAISE);
+    setOutputRange(-1, 1);
     currentSetpoint = ArmSetpoint.BeginningConfiguration;
   }
 
@@ -67,8 +66,7 @@ public class Arm extends PIDSubsystem {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Arm encoder", encoder.get());
-    SmartDashboard.putBoolean("Lower arm limit switch", lowerLimitSwitch.get());
-    SmartDashboard.putBoolean("Upper arm limit switch", upperLimitSwitch.get());
+    SmartDashboard.putBoolean("Arm limit switch", limitSwitch.get());
   }
 
   public void stop() {
@@ -88,27 +86,29 @@ public class Arm extends PIDSubsystem {
    * @param speed the speed to set the arm with, [-1,1]
    */
   public void setSpeed(double speed) {
-    /*
-    if (!lowerLimitSwitch.get() && !upperLimitSwitch.get()) {
-      //if neither limit switch has been triggered, it is safe to just set the speed
-      motor.set(ControlMode.PercentOutput, speed*((speed>0)?RobotMap.ARM_SPEED_RAISE:RobotMap.ARM_SPEED_LOWER));
-    } else if (lowerLimitSwitch.get()) {
-      if (speed < 0)
-        //if the requested speed is less than zero (lowering) and the lower limit switch is triggered,
-        //disallow
+    SmartDashboard.putNumber("Requested arm speed ", speed);
+
+    if (limitSwitch.get()) {
+      if (speed == 0) {
         motor.set(ControlMode.PercentOutput, 0);
-      else
-        motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_LOWER);
-    } else if (upperLimitSwitch.get()) {
-      if (speed>0)
-        //if the requested speed is greater than zero (raising) and the upper limit switch is triggered,
-        //disallow
-        motor.set(ControlMode.PercentOutput, 0);
-      else
-        motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_RAISE);
+      }
+      else {
+        if (speed>0) {
+          //if we are trying to raise and the switch is depressed, we are fine
+          motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_RAISE);
+        } else {
+          //if the limit switch is depressed and the speed is requested is less than than 0 (i.e. lowering)
+          motor.set(ControlMode.PercentOutput, 0);
+        }
+      }
     }
-    */
-    motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_RAISE);
+    else { //if the limit switch hasn't been depressed
+      if (speed>0) {
+        motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_RAISE);
+      } else {
+        motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_LOWER);
+      }
+    }
   }
 
   public void setCurrentSetpoint(ArmSetpoint pos) {

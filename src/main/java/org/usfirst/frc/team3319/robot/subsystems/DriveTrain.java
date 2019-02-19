@@ -17,6 +17,9 @@ public class DriveTrain extends Subsystem {
 	
 	private SwerveDrive swerve = RobotMap.swerve;
 	private PigeonIMU gyro = RobotMap.gyro;
+
+	//For my purposes, the drive train owns the line following functionality of the camera
+	private boolean followLine = true;
 	
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
@@ -32,10 +35,12 @@ public class DriveTrain extends Subsystem {
     }
     
     public void periodic() {
+		/*
     	SmartDashboard.putNumber("Back Left Encoder", RobotMap.backLeftEncoder.get());
     	SmartDashboard.putNumber("Front Left Encoder", RobotMap.frontLeftEncoder.get());
     	SmartDashboard.putNumber("Back Right Encoder", RobotMap.backRightEncoder.get());
-    	SmartDashboard.putNumber("Front Right Encoder", RobotMap.frontRightEncoder.get());
+		SmartDashboard.putNumber("Front Right Encoder", RobotMap.frontRightEncoder.get());
+		*/
 		SmartDashboard.putNumber("Gyro", gyro.getFusedHeading());
 		//SmartDashboard.putString("Ultrasonic reading", RobotMap.ultra.readLastRange().substring(1));
     }
@@ -67,5 +72,12 @@ public class DriveTrain extends Subsystem {
 		swerve.setSteerPosition(angle);
 	}
 	
+	public void toggleLineFollowing() {
+		this.followLine = !this.followLine;
+	}
+
+	public boolean getDisplayLine() {
+		return this.followLine;
+	}
 }
 

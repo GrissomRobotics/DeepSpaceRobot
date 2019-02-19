@@ -10,7 +10,10 @@ package org.usfirst.frc.team3319.robot;
 import org.usfirst.frc.team3319.robot.commands.*;
 
 import org.usfirst.frc.team3319.robot.custom.Controller;
+import org.usfirst.frc.team3319.robot.triggers.ManualModeArmWhileMovingToSetpoint;
+import org.usfirst.frc.team3319.robot.triggers.ManualModeGripperWhileMovingToSetpoint;
 
+import edu.wpi.first.wpilibj.buttons.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -48,20 +51,29 @@ public class OI {
 	
 	Controller driveController;
 	Controller otherController;
+	Trigger gripperInManual;
+	Trigger armInManual;
 
 	public OI() {
 		driveController = new Controller(0);
 		otherController = new Controller(1);
+		gripperInManual = new ManualModeGripperWhileMovingToSetpoint();
+		armInManual = new ManualModeArmWhileMovingToSetpoint();
+
 		SmartDashboard.putBoolean("FIELD Centric", false);
 
+		driveController.getAButton().whenPressed(new ToggleLineFollowing());
 		otherController.getAButton().whenPressed(new LowerGripperToNextSetpoint());
 		otherController.getYButton().whenPressed(new RaiseGripperToNextSetpoint());
 		otherController.getRightBumper().whileHeld(new ExpelCargo());
 		otherController.getLeftBumper().whileHeld(new IntakeCargo());
 		otherController.getBButton().whenPressed(new ExtendFinger());
 		otherController.getXButton().whenPressed(new RetractFinger());
-		otherController.getTopPOVButton().whenActive(new RaiseArmToNextSetpoint());;
+		otherController.getTopPOVButton().whenActive(new RaiseArmToNextSetpoint());
 		otherController.getBottomPOVButton().whenActive(new LowerArmToNextSetpoint());
+
+		gripperInManual.whenActive(new MoveGripperWithJoystick());
+		armInManual.whenActive(new MoveArmWithJoystick());
 		}
 
 	public double getForward() {
