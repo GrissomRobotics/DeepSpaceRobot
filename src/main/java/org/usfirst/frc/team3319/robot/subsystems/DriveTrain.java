@@ -79,5 +79,9 @@ public class DriveTrain extends Subsystem {
 	public boolean getDisplayLine() {
 		return this.followLine;
 	}
+
+	public void resetWheelPosition() {
+		this.swerve.resetWheelPosition();
+	}
 }
 

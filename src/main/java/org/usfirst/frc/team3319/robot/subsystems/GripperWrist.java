@@ -15,6 +15,7 @@ import org.usfirst.frc.team3319.robot.RobotMap;
 import org.usfirst.frc.team3319.robot.commands.MoveGripperWithJoystick;
 import org.usfirst.frc.team3319.robot.custom.GripperSetpoint;
 
+import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
@@ -28,6 +29,7 @@ public class GripperWrist extends PIDSubsystem {
   private VictorSPX wrist = RobotMap.gripperWrist;
   private Encoder wristEncoder = RobotMap.wristEncoder;
   private DigitalInput limitSwitch = RobotMap.wristLimitSwitch;
+  private Counter builtinEncoder = RobotMap.builtinWristEncoder;
   private GripperSetpoint currentSetpoint;
 
   public GripperWrist(double p, double i, double d) {
@@ -47,6 +49,7 @@ public class GripperWrist extends PIDSubsystem {
   public void periodic() {
     SmartDashboard.putNumber("Wrist encoder", wristEncoder.get());
     SmartDashboard.putBoolean("Wrist limit switch", limitSwitch.get());
+    SmartDashboard.putNumber("Builtin wrist encoder", builtinEncoder.get());
 
     if (limitSwitch.get()) {
      // resetEncoder();

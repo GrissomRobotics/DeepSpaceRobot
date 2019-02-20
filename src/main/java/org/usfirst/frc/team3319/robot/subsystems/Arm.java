@@ -88,6 +88,7 @@ public class Arm extends PIDSubsystem {
   public void setSpeed(double speed) {
     SmartDashboard.putNumber("Requested arm speed ", speed);
 
+    /*
     if (limitSwitch.get()) {
       if (speed == 0) {
         motor.set(ControlMode.PercentOutput, 0);
@@ -103,12 +104,24 @@ public class Arm extends PIDSubsystem {
       }
     }
     else { //if the limit switch hasn't been depressed
+    */
       if (speed>0) {
         motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_RAISE);
-      } else {
+      } else if (speed<0){
         motor.set(ControlMode.PercentOutput, speed*RobotMap.ARM_SPEED_LOWER);
+      } else {
+        //motor.set(ControlMode.PercentOutput, RobotMap.ARM_HOLD_SPEED);//RobotMap.ARM_HOLD_SPEED);
       }
+    //}
+  }
+
+  private double calculateHoldSpeed() {
+    int encoderVal = encoder.get();
+    double guess = -7.5629683596753e-4*encoderVal + 0.05439389866302*encoderVal - 0.7833584316;
+    if (guess<0) {
+      return 0.0;
     }
+    return guess+0.1;
   }
 
   public void setCurrentSetpoint(ArmSetpoint pos) {

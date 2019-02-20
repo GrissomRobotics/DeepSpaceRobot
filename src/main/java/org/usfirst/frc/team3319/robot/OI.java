@@ -63,14 +63,14 @@ public class OI {
 		SmartDashboard.putBoolean("FIELD Centric", false);
 
 		driveController.getAButton().whenPressed(new ToggleLineFollowing());
-		otherController.getAButton().whenPressed(new LowerGripperToNextSetpoint());
-		otherController.getYButton().whenPressed(new RaiseGripperToNextSetpoint());
+		//otherController.getAButton().whenPressed(new LowerGripperToNextSetpoint());
+		//otherController.getYButton().whenPressed(new RaiseGripperToNextSetpoint());
 		otherController.getRightBumper().whileHeld(new ExpelCargo());
 		otherController.getLeftBumper().whileHeld(new IntakeCargo());
-		otherController.getBButton().whenPressed(new ExtendFinger());
+		otherController.getBButton().whileHeld(new ExtendFinger());
 		otherController.getXButton().whenPressed(new RetractFinger());
-		otherController.getTopPOVButton().whenActive(new RaiseArmToNextSetpoint());
-		otherController.getBottomPOVButton().whenActive(new LowerArmToNextSetpoint());
+		//otherController.getTopPOVButton().whenActive(new RaiseArmToNextSetpoint());
+		//otherController.getBottomPOVButton().whenActive(new LowerArmToNextSetpoint());
 
 		gripperInManual.whenActive(new MoveGripperWithJoystick());
 		armInManual.whenActive(new MoveArmWithJoystick());

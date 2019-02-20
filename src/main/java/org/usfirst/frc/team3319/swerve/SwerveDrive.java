@@ -102,4 +102,11 @@ public class SwerveDrive {
         swerveEnclosure4.move(0,angle);
     }
 
+	public void resetWheelPosition() {
+        ((DriveEnclosure) swerveEnclosure1).resetEncPosition();
+        ((DriveEnclosure) swerveEnclosure1).resetEncPosition();
+        ((DriveEnclosure) swerveEnclosure1).resetEncPosition();
+        ((DriveEnclosure) swerveEnclosure1).resetEncPosition();
+	}
+
 }

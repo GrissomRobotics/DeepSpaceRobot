@@ -60,7 +60,12 @@ public class DriveEnclosure extends BaseEnclosure {
 
     @Override
     public void setEncPosition(int position) {
-    }
+	}
+	
+	public void resetEncPosition() {
+		pidSystem.setSetpoint(0);//gearRatio is the counts per revolution
+    	pidSystem.enable();
+	}
 
     public SpeedController getDriveMotor()
 	{

@@ -17,7 +17,9 @@ import org.usfirst.frc.team3319.swerve.SwerveDrive;
 import org.usfirst.frc.team3319.swerve.SwerveEnclosure;
 
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SerialPort;
@@ -46,8 +48,10 @@ public class RobotMap {
 	public final static double WRIST_SPEED = 1.00;
 	public final static double WRIST_HOLD_SPEED = 0.2;
 	public final static double GRIPPER_WHEELS_SPEED = 0.5;
-	public final static double ARM_SPEED_RAISE = 1.0;//TODO: actual value raising the arm speed
-	public final static double ARM_SPEED_LOWER = 0.6; //TODO: actual value lowering the arm speed
+	public final static double ARM_SPEED_RAISE = 1.0;
+	public final static double ARM_SPEED_LOWER = 0.6; 
+	public final static double ARM_HOLD_SPEED = 0.15;
+
 	public static final double PID_PERIOD = 0.02; //This should be the same as the robot period, i.e. 20ms
 
 	//Drive PID variables
@@ -114,6 +118,7 @@ public class RobotMap {
 	//gripper wrist 
 	public static VictorSPX gripperWrist;
 	public static Encoder wristEncoder;
+	public static Counter builtinWristEncoder;
 	public static DigitalInput wristLimitSwitch;
 
 	//gripper wheels
@@ -127,7 +132,7 @@ public class RobotMap {
 
 	//Finger
 	public static DoubleSolenoid finger;
-	public static Compressor compressor;
+	//public static Compressor compressor;
 
 	//sensors
 	public static PigeonIMU gyro;
@@ -166,6 +171,8 @@ public class RobotMap {
 		wristEncoder = new Encoder(8, 9);
 		LiveWindow.add(wristEncoder);
 		wristLimitSwitch = new DigitalInput(13); //port 3 on the MXP
+		builtinWristEncoder = new Counter(new DigitalInput(15));//port 5 on the MXP
+		
 
 		//Gripper wheels
 		gripperWheels = new VictorSPX(2);
@@ -178,8 +185,10 @@ public class RobotMap {
 		//Gripper finger(pneumatic)
 		finger = new DoubleSolenoid(4, 0, 1);
 
+		/*
 		compressor = new Compressor(0);
-        compressor.setClosedLoopControl(true);
+		compressor.setClosedLoopControl(true);
+		*/
 
 		//sensors
 		gyro = new PigeonIMU(0);

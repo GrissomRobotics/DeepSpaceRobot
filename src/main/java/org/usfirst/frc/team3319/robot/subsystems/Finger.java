@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Finger extends Subsystem {
 
   private DoubleSolenoid fingerSolenoid = RobotMap.finger; 
-  private Compressor compressor = RobotMap.compressor;
+  //private Compressor compressor = RobotMap.compressor;
 
   @Override
   public void initDefaultCommand() {
@@ -29,11 +29,12 @@ public class Finger extends Subsystem {
 
   @Override
   public void periodic() {
-    if (SmartDashboard.getBoolean("Enable compressor? ", true)) {
+   /* if (SmartDashboard.getBoolean("Enable compressor? ", true)) {
       enableCompressor();  
     } else {
       disableCompressor();
     }
+    */
   }
 
   public void extend() {
@@ -44,6 +45,16 @@ public class Finger extends Subsystem {
     fingerSolenoid.set(Value.kReverse);
   }
 
+  public void toggle() {
+    switch(fingerSolenoid.get()) {
+      case kForward:
+        fingerSolenoid.set(Value.kReverse);
+      case kReverse:
+        fingerSolenoid.set(Value.kForward);;
+    }
+  }
+
+  /*
   public void disableCompressor() {
     compressor.stop();
   }
@@ -51,4 +62,5 @@ public class Finger extends Subsystem {
   public void enableCompressor() {
     compressor.start();
   }
+  */
 }
