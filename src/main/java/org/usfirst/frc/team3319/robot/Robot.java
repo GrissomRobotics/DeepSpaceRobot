@@ -220,6 +220,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		teleopInit();
 	}
 
 	/**
@@ -228,7 +229,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousPeriodic() {
 		//We are just using the camera to drive during the sandstorm, so no special action with an autonomous mode is necessary
-		Scheduler.getInstance().run();
+		teleopPeriodic();
 	}
 
 	@Override
