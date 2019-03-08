@@ -42,7 +42,6 @@ class TapeRecognitionPipeline:
         """
         Runs the pipeline and sets all outputs to new values.
         """
-        lastTime = time.time()
         # Step Resize_Image0:
         self.__resize_image_input = source0
         (self.resize_image_output) = self.__resize_image(self.__resize_image_input, self.__resize_image_width, self.__resize_image_height, self.__resize_image_interpolation)
@@ -74,10 +73,7 @@ class TapeRecognitionPipeline:
         rows,cols = image.shape
 
         M = cv2.getRotationMatrix2D((cols/2,rows/2),90,1)
-        image = cv2.warpAffine(image,M,(cols,rows))
-
-        contour = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]
-        
+        image = cv2.warpAffine(image,M,(cols,rows))        
 
         points = numpy.argwhere(image==255)
         

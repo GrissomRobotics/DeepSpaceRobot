@@ -117,7 +117,7 @@ public class Arm extends PIDSubsystem {
 
   private double calculateHoldSpeed() {
     int encoderVal = encoder.get();
-    double guess = -7.5629683596753e-4*encoderVal + 0.05439389866302*encoderVal - 0.7833584316;
+    double guess = -7.5629683596753e-4*encoderVal*encoderVal + 0.05439389866302*encoderVal - 0.7833584316;
     if (guess<0) {
       return 0.0;
     }

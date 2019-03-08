@@ -10,7 +10,6 @@ package org.usfirst.frc.team3319.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
-import org.usfirst.frc.team3319.robot.Robot;
 import org.usfirst.frc.team3319.robot.RobotMap;
 import org.usfirst.frc.team3319.robot.commands.MoveGripperWithJoystick;
 import org.usfirst.frc.team3319.robot.custom.GripperSetpoint;

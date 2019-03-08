@@ -7,15 +7,10 @@
 
 package org.usfirst.frc.team3319.robot;
 
-import java.util.ArrayList;
-
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.Moments;
 import org.usfirst.frc.team3319.robot.subsystems.Arm;
 import org.usfirst.frc.team3319.robot.subsystems.DriveTrain;
 import org.usfirst.frc.team3319.robot.subsystems.Finger;
@@ -69,7 +64,7 @@ public class Robot extends TimedRobot {
 	private double y;
 	private NetworkTable networkTable;
 	private NetworkTableInstance networkTableInstance;
-	private Mat lineImage = new Mat(240,320,CvType.CV_8UC1, new Scalar(255,255,255));
+
 
 	
 
@@ -142,7 +137,6 @@ public class Robot extends TimedRobot {
 		);
 		visionThread = new VisionThread(visionRunner);
 		visionThread.start();
-		
 	}
 
 	//This function is called each time the tape recognizer finishes processing a frame
@@ -221,6 +215,11 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		teleopInit();
+		//These sensors should only be reset at the beginning of the match, not also at the beinning of teleop
+		driveTrain.resetEncoders();
+		driveTrain.resetGyro();
+		gripperWrist.resetEncoder();
+		arm.resetEncoder();
 	}
 
 	/**
@@ -230,18 +229,12 @@ public class Robot extends TimedRobot {
 	public void autonomousPeriodic() {
 		//We are just using the camera to drive during the sandstorm, so no special action with an autonomous mode is necessary
 		teleopPeriodic();
+
 	}
 
 	@Override
 	public void teleopInit() {
 		driveTrain.setCentricMode(SmartDashboard.getBoolean("FIELD Centric",true) ? CentricMode.FIELD : CentricMode.ROBOT);
-		//reset all sensor values to prepare for driving
-		driveTrain.resetEncoders();
-		driveTrain.resetGyro();
-		gripperWrist.resetEncoder();
-		arm.resetEncoder();
-		finger.retract();
-		
 	}
 
 	/**
@@ -265,9 +258,6 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override 
-	public void robotPeriodic() {
+	public void robotPeriodic() { 
 	}
-
-
-	
 }

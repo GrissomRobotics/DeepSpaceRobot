@@ -9,11 +9,9 @@ package org.usfirst.frc.team3319.robot.subsystems;
 
 import org.usfirst.frc.team3319.robot.RobotMap;
 
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Add your docs here.
@@ -50,7 +48,9 @@ public class Finger extends Subsystem {
       case kForward:
         fingerSolenoid.set(Value.kReverse);
       case kReverse:
-        fingerSolenoid.set(Value.kForward);;
+        fingerSolenoid.set(Value.kForward);
+      case kOff:
+        //
     }
   }
 

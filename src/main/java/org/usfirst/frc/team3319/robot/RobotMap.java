@@ -16,21 +16,18 @@ import org.usfirst.frc.team3319.swerve.DriveEnclosure;
 import org.usfirst.frc.team3319.swerve.SwerveDrive;
 import org.usfirst.frc.team3319.swerve.SwerveEnclosure;
 
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SerialPort.Parity;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.SerialPort.StopBits;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Victor;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * The RobotMap is a mapping from the ports sensors and actuators are wired into
