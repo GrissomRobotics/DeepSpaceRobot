@@ -35,13 +35,16 @@ public class Finger extends Subsystem {
     */
   }
 
-  public void extend() {
+  public void extendFinger() {
     fingerSolenoid.set(Value.kForward);
   }
 
-  public void retract() {
+  public void retractFinger() {
     fingerSolenoid.set(Value.kReverse);
   }
+
+
+  //public void 
 
   public void toggle() {
     switch(fingerSolenoid.get()) {

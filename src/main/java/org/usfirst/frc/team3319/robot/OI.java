@@ -62,13 +62,21 @@ public class OI {
 
 		SmartDashboard.putBoolean("FIELD Centric", false);
 
-		driveController.getAButton().whenPressed(new ToggleLineFollowing());
+		driveController.getAButton().whenPressed(new ToggleCentricMode());
+		driveController.getYButton().whenPressed(new ToggleWristLimitSwitch());
+		//driveController.getBButton().whenPressed(new ToggleLineFollowing());
+		driveController.getTopPOVButton().whenActive(new ExtendFrontClimber());
+		driveController.getBottomPOVButton().whenActive(new ExtendBackClimber());
+		driveController.getXButton().whenActive(new RetractAllClimber());
+		driveController.getRightBumper().whenPressed(new ToggleWristFeedForward());
 		//otherController.getAButton().whenPressed(new LowerGripperToNextSetpoint());
 		//otherController.getYButton().whenPressed(new RaiseGripperToNextSetpoint());
 		otherController.getRightBumper().whileHeld(new ExpelCargo());
 		otherController.getLeftBumper().whileHeld(new IntakeCargo());
 		otherController.getBButton().whileHeld(new ExtendFinger());
 		otherController.getXButton().whenPressed(new RetractFinger());
+		//otherController.getTopPOVButton().whenActive(new GetHatch());
+		//otherController.getBottomPOVButton().whenActive(new ReleaseHatch());
 		//otherController.getTopPOVButton().whenActive(new RaiseArmToNextSetpoint());
 		//otherController.getBottomPOVButton().whenActive(new LowerArmToNextSetpoint());
 
@@ -92,11 +100,25 @@ public class OI {
 
 	public double getManualArmMotion() {
 		//negate because forward is negative
-		return -otherController.getLeftJoystickYAxis();
+		//return -otherController.getLeftJoystickYAxis();
+
+		//quadratic control
+		if (otherController.getLeftJoystickYAxis() > 0) {
+			return -otherController.getLeftJoystickYAxis()*otherController.getLeftJoystickYAxis();
+		} else {
+			return otherController.getLeftJoystickYAxis()*otherController.getLeftJoystickYAxis();
+		}
 	}
 
 	public double getManualGripperMotion() {
 		//negate this value because forward is negative
-		return -otherController.getRightJoystickYAxis();
+		//return -otherController.getRightJoystickYAxis();
+
+		//quadratic control
+		if (otherController.getRightJoystickYAxis() > 0) {
+			return -otherController.getRightJoystickYAxis()*otherController.getRightJoystickYAxis();
+		} else {
+			return otherController.getRightJoystickYAxis()*otherController.getRightJoystickYAxis();
+		}
 	}
 }

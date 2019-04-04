@@ -28,8 +28,9 @@ public class GripperWrist extends PIDSubsystem {
   private VictorSPX wrist = RobotMap.gripperWrist;
   private Encoder wristEncoder = RobotMap.wristEncoder;
   private DigitalInput limitSwitch = RobotMap.wristLimitSwitch;
-  private Counter builtinEncoder = RobotMap.builtinWristEncoder;
   private GripperSetpoint currentSetpoint;
+  private boolean useLimitSwitch = true;
+  private boolean useFeedForward = true;
 
   public GripperWrist(double p, double i, double d) {
     super(p,i,d);
@@ -48,7 +49,7 @@ public class GripperWrist extends PIDSubsystem {
   public void periodic() {
     SmartDashboard.putNumber("Wrist encoder", wristEncoder.get());
     SmartDashboard.putBoolean("Wrist limit switch", limitSwitch.get());
-    SmartDashboard.putNumber("Builtin wrist encoder", builtinEncoder.get());
+    SmartDashboard.putBoolean("Using wrist limit switch", useLimitSwitch);
 
     if (limitSwitch.get()) {
      // resetEncoder();
@@ -97,6 +98,14 @@ public class GripperWrist extends PIDSubsystem {
     return currentSetpoint;
   }
 
+  public void toggleUsingLimitSwitch() {
+    useLimitSwitch = !useLimitSwitch;
+  }
+
+  public void toggleFeedForward() {
+    useFeedForward = !useFeedForward;
+  }
+
   /**
    * This method should be used for all applications involving changing speed in the gripper,
    * as it contains the limit switch logic that prevents the subsystem from harming itself
@@ -105,26 +114,38 @@ public class GripperWrist extends PIDSubsystem {
    * @param speed the speed to set the wrist with, [-1,1]
    */
   public void setSpeed(double speed) {
-    if (limitSwitch.get()) {
-        if (speed == 0) {
-          wrist.set(ControlMode.PercentOutput, 0);
-        }
-        else {
-          if (speed<0) {
-            //if we are trying to lower and the switch is depressed, we are fine
-            wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
+    if (useFeedForward) {
+      if (useLimitSwitch) {
+        if (limitSwitch.get()) {
+            if (speed == 0) {
+              wrist.set(ControlMode.PercentOutput, 0);
+            }
+            else {
+              if (speed<0) {
+                //if we are trying to lower and the switch is depressed, we are fine
+                wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
+              } else {
+                //if the limit switch is depressed and the speed is requested is greater than 0 (i.e. raising)
+                wrist.set(ControlMode.PercentOutput, 0);
+              }
+            }
+          }
+        else { //if the limit switch hasn't been depressed
+          if (speed ==0) {
+            wrist.set(ControlMode.PercentOutput, RobotMap.WRIST_HOLD_SPEED);
           } else {
-            //if the limit switch is depressed and the speed is requested is greater than 0 (i.e. raising)
-            wrist.set(ControlMode.PercentOutput, 0);
+            wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED); 
           }
         }
-      }
-      else { //if the limit switch hasn't been depressed
+      } else { //if we aren't using the limit switch the reason for this is that so if the limit switch fails we are not dead in the water
         if (speed ==0) {
           wrist.set(ControlMode.PercentOutput, RobotMap.WRIST_HOLD_SPEED);
         } else {
-          wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
+          wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED); 
         }
       }
+    } else {
+      wrist.set(ControlMode.PercentOutput, speed*RobotMap.WRIST_SPEED);
     }
+  }
 }

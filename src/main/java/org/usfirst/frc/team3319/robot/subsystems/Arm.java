@@ -28,7 +28,7 @@ public class Arm extends PIDSubsystem {
     super(p,i,d,f,RobotMap.PID_PERIOD);
     //TODO figure out appropriate tolerance for the arm
     setPercentTolerance(3.0);
-    setOutputRange(-1, 1);
+    setOutputRange(-0.4, 0.4);
     currentSetpoint = ArmSetpoint.BeginningConfiguration;
   }
 

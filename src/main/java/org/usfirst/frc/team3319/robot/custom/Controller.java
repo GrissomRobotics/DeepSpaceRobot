@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.buttons.Trigger;
 
 //This class provides the interface for the XBox Controller or the Logitech Controller, so that the OI class is not responsible for determining logic 
-//like calculating the appropriate rotation value or deadzoning the input
-//Additionally, this provides greater flexibility for changing to a new controller, as simply a new class would be created that 
+//like which button on the controller is which number on the OI or deadzoning the input
+//Additionally, this provides greater flexibility for changing to a new controller, as a new class would be created that 
 //associated each button with the appropriate number from the driver station, rather than the OI class being responsible for it
 //The primary purpose of this class is to abstract away controller level logic from the main program
 

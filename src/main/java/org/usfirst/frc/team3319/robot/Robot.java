@@ -12,10 +12,12 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team3319.robot.subsystems.Arm;
+import org.usfirst.frc.team3319.robot.subsystems.Climber;
 import org.usfirst.frc.team3319.robot.subsystems.DriveTrain;
 import org.usfirst.frc.team3319.robot.subsystems.Finger;
 import org.usfirst.frc.team3319.robot.subsystems.GripperWheels;
 import org.usfirst.frc.team3319.robot.subsystems.GripperWrist;
+import org.usfirst.frc.team3319.robot.subsystems.HatchHook;
 import org.usfirst.frc.team3319.robot.vision.ResizingPipeline;
 import org.usfirst.frc.team3319.swerve.math.CentricMode;
 
@@ -47,6 +49,8 @@ public class Robot extends TimedRobot {
 	public static GripperWheels gripperWheels;
 	public static Arm arm;
 	public static Finger finger;
+	public static HatchHook hatchHook;
+	public static Climber climber;
 
 	//OI	
 	public static OI oi;
@@ -66,7 +70,6 @@ public class Robot extends TimedRobot {
 	private NetworkTableInstance networkTableInstance;
 
 
-	
 
 	//Vision processing
 	
@@ -94,6 +97,8 @@ public class Robot extends TimedRobot {
 		gripperWheels = new GripperWheels();
 		arm = new Arm(RobotMap.ARM_P,RobotMap.ARM_I,RobotMap.ARM_D,RobotMap.ARM_F);
 		finger = new Finger();
+		//hatchHook = new HatchHook();
+		climber = new Climber();
 
 		//create OI
 		oi = new OI();
@@ -101,7 +106,6 @@ public class Robot extends TimedRobot {
 
 		SmartDashboard.putData(((Sendable) driveTrain));
 		SmartDashboard.putData((Sendable) gripperWrist);
-		SmartDashboard.putData((Sendable) gripperWheels);
 		SmartDashboard.putData((Sendable) arm);
 		LiveWindow.add(gripperWrist);
 		LiveWindow.add(arm);
@@ -119,7 +123,7 @@ public class Robot extends TimedRobot {
 			}, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 		
 
-		SmartDashboard.putBoolean("Enable compressor? ", true);
+		//SmartDashboard.putBoolean("Enable compressor? ", true);
 
 		//Vision processing logic
 		streamSource = CameraServer.getInstance().startAutomaticCapture();
@@ -138,22 +142,6 @@ public class Robot extends TimedRobot {
 		visionThread = new VisionThread(visionRunner);
 		visionThread.start();
 	}
-
-	//This function is called each time the tape recognizer finishes processing a frame
-	/*
-	private void pipelineFinished() {
-		ArrayList<MatOfPoint> contours = tapeRecognitionPipeline.filterContoursOutput();
-		//line = new Mat(new Size(), 0);
-		if (contours.size()>0) {
-			Moments m = Imgproc.moments(contours.get(0));
-			Point centroid = new Point(m.m10 / m.m00,  m.m01 / m.m00);
-			//Imgproc.fitLine(contours.get(0), line, Imgproc.CV_DIST_L2, 0, 0.01, 0.01);
-			Imgproc.drawContours(image, contours, 0 , new Scalar(0,0,0));//black outline
-			Imgproc.drawMarker(image, centroid, new Scalar(0,0,0));
-		}
-		outputToDashboard.putFrame(image);
-	}
-	*/
 	
 	/** This function is called each time that the vision coprocessor updates 
 	 *  the data related to line following.
@@ -161,7 +149,7 @@ public class Robot extends TimedRobot {
 	private void imageUpdated() {
 		image = tapeRecognitionPipeline.resizeImageOutput();
 
-		SmartDashboard.putBoolean("Displaying line: ",driveTrain.getDisplayLine());
+		//SmartDashboard.putBoolean("Displaying line: ",driveTrain.getDisplayLine());
 
 		if (driveTrain.getDisplayLine()) {
 			vx =  lineEntryVectorX.getDouble(vx);
@@ -192,7 +180,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit() {
-		finger.retract();
+		finger.retractFinger();
  	}
 
 	@Override
@@ -220,6 +208,7 @@ public class Robot extends TimedRobot {
 		driveTrain.resetGyro();
 		gripperWrist.resetEncoder();
 		arm.resetEncoder();
+		//hatchHook.getHatch();
 	}
 
 	/**
@@ -234,7 +223,10 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-		driveTrain.setCentricMode(SmartDashboard.getBoolean("FIELD Centric",true) ? CentricMode.FIELD : CentricMode.ROBOT);
+		driveTrain.setCentricMode(SmartDashboard.getBoolean("FIELD Centric",false) ? CentricMode.FIELD : CentricMode.ROBOT);	
+		driveTrain.resetGyro();
+		gripperWrist.resetEncoder();
+		arm.resetEncoder();
 	}
 
 	/**

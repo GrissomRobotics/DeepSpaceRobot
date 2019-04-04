@@ -38,10 +38,10 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 public class RobotMap {
 	
 	//Robot variables
-	public final static double LENGTH = 21;
+	public final static double LENGTH = 22;
 	public final static double WIDTH = 20.5;
 	public final static double TURN_SPEED = 0.75;
-	public final static double MAX_DRIVE_SPEED = 0.5;
+	public final static double MAX_DRIVE_SPEED = 0.68;
 	public final static double WRIST_SPEED = 1.00;
 	public final static double WRIST_HOLD_SPEED = 0.2;
 	public final static double GRIPPER_WHEELS_SPEED = 0.5;
@@ -115,7 +115,6 @@ public class RobotMap {
 	//gripper wrist 
 	public static VictorSPX gripperWrist;
 	public static Encoder wristEncoder;
-	public static Counter builtinWristEncoder;
 	public static DigitalInput wristLimitSwitch;
 
 	//gripper wheels
@@ -129,7 +128,12 @@ public class RobotMap {
 
 	//Finger
 	public static DoubleSolenoid finger;
+	public static DoubleSolenoid hatch;
 	//public static Compressor compressor;
+
+	//Climber
+	public static DoubleSolenoid frontClimber;
+	public static DoubleSolenoid backClimber;
 
 	//sensors
 	public static PigeonIMU gyro;
@@ -167,9 +171,7 @@ public class RobotMap {
 		gripperWrist = new VictorSPX(1);
 		wristEncoder = new Encoder(8, 9);
 		LiveWindow.add(wristEncoder);
-		wristLimitSwitch = new DigitalInput(13); //port 3 on the MXP
-		builtinWristEncoder = new Counter(new DigitalInput(15));//port 5 on the MXP
-		
+		wristLimitSwitch = new DigitalInput(13); //port 3 on the MXP		
 
 		//Gripper wheels
 		gripperWheels = new VictorSPX(2);
@@ -182,6 +184,13 @@ public class RobotMap {
 		//Gripper finger(pneumatic)
 		finger = new DoubleSolenoid(4, 0, 1);
 
+		//Hatch hook
+		hatch = new DoubleSolenoid(4,2,3);
+
+		//Climber
+		frontClimber = new DoubleSolenoid(4,4,5);
+		backClimber = new DoubleSolenoid(4,6,7);
+
 		/*
 		compressor = new Compressor(0);
 		compressor.setClosedLoopControl(true);
@@ -190,10 +199,11 @@ public class RobotMap {
 		//sensors
 		gyro = new PigeonIMU(0);
 
+		/*
 		SerialPort ultraSerial = new SerialPort(9600, Port.kOnboard, 8, Parity.kNone, StopBits.kOne);
 		ultraSerial.reset();
 		ultra = new UltrasonicSensor(ultraSerial);
-
+		*/
 
 	}
 }

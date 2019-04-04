@@ -11,49 +11,39 @@ import org.usfirst.frc.team3319.robot.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-public class ExtendFinger extends Command {
-  private long startTime;
-
-  public ExtendFinger() {
+public class ExtendBackClimber extends Command {
+  public ExtendBackClimber() {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
-    requires(Robot.finger);
-    requires(Robot.hatchHook);
+    requires(Robot.climber);
   }
 
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-    Robot.hatchHook.releaseHatch();
-    //startTime = System.currentTimeMillis();
-    Robot.finger.extendFinger();
+    Robot.climber.extendBack();
+    Robot.climber.retractFront();
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    //if (System.currentTimeMillis() - startTime > 70) {
-      
-    //}
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    return false;
+    return true;
   }
 
-  
   // Called once after isFinished returns true
   @Override
   protected void end() {
-    Robot.finger.retractFinger();
   }
 
   // Called when another command which requires one or more of the same
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
-    end();
   }
 }

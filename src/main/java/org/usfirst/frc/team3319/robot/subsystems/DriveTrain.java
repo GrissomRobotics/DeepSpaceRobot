@@ -20,6 +20,7 @@ public class DriveTrain extends Subsystem {
 
 	//For my purposes, the drive train owns the line following functionality of the camera
 	private boolean followLine = true;
+	private CentricMode mode = CentricMode.ROBOT;
 	
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
@@ -31,7 +32,13 @@ public class DriveTrain extends Subsystem {
     }
     
     public void setCentricMode(CentricMode mode) {
-    	swerve.setCentricMode(mode);
+			swerve.setCentricMode(mode);
+			this.mode = mode;
+			if (mode==CentricMode.FIELD) {
+				SmartDashboard.putBoolean("FIELD Centric", true);
+			} else {
+				SmartDashboard.putBoolean("FIELD Centric", false);
+			}
     }
     
     public void periodic() {
@@ -41,6 +48,7 @@ public class DriveTrain extends Subsystem {
     	SmartDashboard.putNumber("Back Right Encoder", RobotMap.backRightEncoder.get());
 		SmartDashboard.putNumber("Front Right Encoder", RobotMap.frontRightEncoder.get());
 		*/
+		
 		SmartDashboard.putNumber("Gyro", gyro.getFusedHeading());
 		//SmartDashboard.putString("Ultrasonic reading", RobotMap.ultra.readLastRange().substring(1));
     }
@@ -48,7 +56,7 @@ public class DriveTrain extends Subsystem {
     public void resetEncoders() {
     	RobotMap.backLeftEncoder.reset();
     	RobotMap.backRightEncoder.reset();
-		RobotMap.frontLeftEncoder.reset();
+			RobotMap.frontLeftEncoder.reset();
     	RobotMap.frontRightEncoder.reset();
     }
     
@@ -82,6 +90,16 @@ public class DriveTrain extends Subsystem {
 
 	public void resetWheelPosition() {
 		this.swerve.resetWheelPosition();
+	}
+
+	public void toggleCentricMode() {
+		switch (this.mode) {
+			case FIELD:
+				this.mode = CentricMode.ROBOT;
+			case ROBOT:
+				this.mode = CentricMode.FIELD;
+		}
+		this.setCentricMode(this.mode);
 	}
 }
 
