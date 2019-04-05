@@ -41,6 +41,7 @@ public class RobotMap {
 	public final static double LENGTH = 22;
 	public final static double WIDTH = 20.5;
 	public final static double TURN_SPEED = 0.75;
+	public final static double NORMAL_SPEED = 1.0;
 	public final static double REDUCED_SPEED = 0.5;
 	public final static double MAX_DRIVE_SPEED = 0.68;
 	public final static double WRIST_SPEED = 1.00;
