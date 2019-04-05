@@ -21,6 +21,7 @@ public class DriveTrain extends Subsystem {
 	//For my purposes, the drive train owns the line following functionality of the camera
 	private boolean followLine = true;
 	private CentricMode mode = CentricMode.ROBOT;
+	private double driveSpeed = RobotMap.DRIVE_SPEED;
 	
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
@@ -101,5 +102,15 @@ public class DriveTrain extends Subsystem {
 		}
 		this.setCentricMode(this.mode);
 	}
+	
+	public void toggleSpeed() {
+		switch(this.driveSpeed) {
+			case RobotMap.DRIVE_SPEED:
+				this.driveSpeed = RobotMap.REDUCED_SPEED;
+			case RobotMap.REDUCED_SPEED:
+				this.driveSpeed = RobotMap.DRIVE_SPEED;
+		}
+	}
+		
 }
 
