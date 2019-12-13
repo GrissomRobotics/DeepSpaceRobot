@@ -97,7 +97,7 @@ public class Robot extends TimedRobot {
 		gripperWheels = new GripperWheels();
 		arm = new Arm(RobotMap.ARM_P,RobotMap.ARM_I,RobotMap.ARM_D,RobotMap.ARM_F);
 		finger = new Finger();
-		//hatchHook = new HatchHook();
+		hatchHook = new HatchHook(); 
 		climber = new Climber();
 
 		//create OI
